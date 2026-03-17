@@ -265,10 +265,10 @@ const POKEMONS = [
 function getImage(id) {
   if (!id) return null;
   if (id.startsWith("minecraft:")) {
-    const name = id.split(":")[1];
-    return `/blocks/${name}.png`;
+    const name = id.split(":")[1].replace(" ", "_"); // remplace les espaces
+    return `blocks/${name}.png`; // chemin relatif
   } else {
-    return `/pokemon/${id}.png`;
+    return `pokemon/${id}.png`; // chemin relatif
   }
 }
 
@@ -288,7 +288,8 @@ function Draggable({ id, label }) {
       className="item"
     >
       <img src={getImage(label)} alt={label} className="img" />
-      <div className="label">{label}</div> {/* <-- Nom sous l'image */}
+      <div className="label"> {label.replace(/^minecraft:\s*/, "")}</div>{" "}
+      {/* <-- Nom sous l'image */}
     </div>
   );
 }

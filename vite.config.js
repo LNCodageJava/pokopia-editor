@@ -3,5 +3,5 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  base: "/pokopia-editor-dist/", // <-- met ici le nom exact de ton repo GitHub
+  base: "./", // <-- met ici le nom exact de ton repo GitHub
 });
