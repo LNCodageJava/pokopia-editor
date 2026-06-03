@@ -1,12 +1,156 @@
+import React, { useState, useEffect, useRef } from "react";
 import { DndContext, useDraggable, useDroppable } from "@dnd-kit/core";
-import { useState } from "react";
 import "./App.css";
+import PokemonAutocomplete from "./components/PokemonAutocomplete";
+
+const LAYOUT_KEY = "pokopia.rules.layout.v1";
 
 const BLOCKS = [
-  "minecraft:sand",
+  "minecraft:air",
+  "minecraft:stone",
+  "minecraft:granite",
+  "minecraft:polished_granite",
+  "minecraft:diorite",
+  "minecraft:polished_diorite",
+  "minecraft:andesite",
+  "minecraft:polished_andesite",
   "minecraft:grass_block",
   "minecraft:dirt",
+  "minecraft:coarse_dirt",
+  "minecraft:podzol",
+  "minecraft:crimson_nylium",
+  "minecraft:warped_nylium",
+  "minecraft:crimson_roots",
+  "minecraft:warped_roots",
+  "minecraft:mycelium",
+  "minecraft:sand",
+  "minecraft:red_sand",
+  "minecraft:gravel",
+  "minecraft:cobblestone",
+  "minecraft:oak_planks",
+  "minecraft:spruce_planks",
+  "minecraft:birch_planks",
+  "minecraft:jungle_planks",
+  "minecraft:acacia_planks",
+  "minecraft:dark_oak_planks",
+  "minecraft:crimson_planks",
+  "minecraft:warped_planks",
+  "minecraft:oak_log",
+  "minecraft:spruce_log",
+  "minecraft:birch_log",
+  "minecraft:jungle_log",
+  "minecraft:acacia_log",
+  "minecraft:dark_oak_log",
+  "minecraft:crimson_stem",
+  "minecraft:warped_stem",
+  "minecraft:oak_leaves",
+  "minecraft:spruce_leaves",
+  "minecraft:birch_leaves",
+  "minecraft:jungle_leaves",
+  "minecraft:acacia_leaves",
+  "minecraft:dark_oak_leaves",
+  "minecraft:sponge",
+  "minecraft:wet_sponge",
+  "minecraft:glass",
+  "minecraft:lapis_block",
+  "minecraft:lapis_ore",
+  "minecraft:coal_ore",
+  "minecraft:iron_ore",
+  "minecraft:copper_ore",
+  "minecraft:gold_ore",
+  "minecraft:redstone_ore",
+  "minecraft:diamond_ore",
+  "minecraft:emerald_ore",
+  "minecraft:nether_gold_ore",
+  "minecraft:ancient_debris",
+  "minecraft:deepslate",
+  "minecraft:copper_block",
+  "minecraft:iron_block",
+  "minecraft:gold_block",
+  "minecraft:diamond_block",
+  "minecraft:emerald_block",
+  "minecraft:obsidian",
+  "minecraft:end_stone",
+  "minecraft:bedrock",
+  "minecraft:stone_bricks",
+  "minecraft:mossy_stone_bricks",
+  "minecraft:cracked_stone_bricks",
+  "minecraft:chiseled_stone_bricks",
+  "minecraft:sandstone",
+  "minecraft:cut_sandstone",
+  "minecraft:chiseled_sandstone",
+  "minecraft:red_sandstone",
+  "minecraft:cut_red_sandstone",
+  "minecraft:chiseled_red_sandstone",
+  "minecraft:brick_block",
+  "minecraft:clay",
+  "minecraft:terracotta",
+  "minecraft:white_terracotta",
+  "minecraft:orange_terracotta",
+  "minecraft:magenta_terracotta",
+  "minecraft:light_blue_terracotta",
+  "minecraft:yellow_terracotta",
+  "minecraft:lime_terracotta",
+  "minecraft:pink_terracotta",
+  "minecraft:gray_terracotta",
+  "minecraft:light_gray_terracotta",
+  "minecraft:cyan_terracotta",
+  "minecraft:purple_terracotta",
+  "minecraft:blue_terracotta",
+  "minecraft:brown_terracotta",
+  "minecraft:green_terracotta",
+  "minecraft:red_terracotta",
+  "minecraft:black_terracotta",
+  "minecraft:bookshelf",
+  "minecraft:crafting_table",
+  "minecraft:furnace",
+  "minecraft:blast_furnace",
+  "minecraft:smoker",
+  "minecraft:chest",
+  "minecraft:trapped_chest",
+  "minecraft:hopper",
+  "minecraft:anvil",
+  "minecraft:enchanting_table",
+  "minecraft:beacon",
+  "minecraft:jukebox",
+  "minecraft:dispenser",
+  "minecraft:dropper",
+  "minecraft:observer",
+  "minecraft:piston",
+  "minecraft:sticky_piston",
+  "minecraft:sticky_piston_head",
+  "minecraft:lever",
   "minecraft:rail",
+  "minecraft:activator_rail",
+  "minecraft:detector_rail",
+  "minecraft:powered_rail",
+  "minecraft:hay_block",
+  "minecraft:slime_block",
+  "minecraft:snow",
+  "minecraft:snow_block",
+  "minecraft:ice",
+  "minecraft:packed_ice",
+  "minecraft:blue_ice",
+  "minecraft:water",
+  "minecraft:lava",
+  "minecraft:sea_lantern",
+  "minecraft:glowstone",
+  "minecraft:shroomlight",
+  "minecraft:campfire",
+  "minecraft:soul_campfire",
+  "minecraft:lantern",
+  "minecraft:soul_lantern",
+  "minecraft:torch",
+  "minecraft:soul_torch",
+  "minecraft:cobblestone_wall",
+  "minecraft:andesite_wall",
+  "minecraft:granite_wall",
+  "minecraft:diorite_wall",
+  "minecraft:mossy_cobblestone_wall",
+  "minecraft:brick_wall",
+  "minecraft:blackstone_wall",
+  "minecraft:nether_brick_wall",
+  "minecraft:red_nether_brick_wall",
   // ajoute davantage si besoin
 ];
 
@@ -124,10 +268,10 @@ const POKEMONS = [
 function getImage(id) {
   if (!id) return null;
   if (id.startsWith("minecraft:")) {
-    const name = id.split(":")[1].replace(" ", "_"); // remplace les espaces
-    return `blocks/${name}.png`; // chemin relatif
+    const name = id.split(":")[1];
+    return `/blocks/${name}.png`;
   } else {
-    return `pokemon/${id}.png`; // chemin relatif
+    return `/pokemon/${id}.png`;
   }
 }
 
@@ -147,8 +291,7 @@ function Draggable({ id, label }) {
       className="item"
     >
       <img src={getImage(label)} alt={label} className="img" />
-      <div className="label"> {label.replace(/^minecraft:\s*/, "")}</div>{" "}
-      {/* <-- Nom sous l'image */}
+      <div className="label">{label}</div>
     </div>
   );
 }
@@ -163,13 +306,277 @@ function Slot({ id, value }) {
   );
 }
 
+// RuleCard: carte affichant une règle et déplaçable librement sur le canvas
+function RuleCard({ index, rule, positions, setPositions, bringToFront, rules, setRules, pokemonSuggestions, blockSuggestions }) {
+  const ref = useRef(null);
+  const draggingRef = useRef({});
+  const [editing, setEditing] = useState(false);
+  const [activeType, setActiveType] = useState('block'); // 'block' | 'pokemon' | 'level'
+  const [activeSlot, setActiveSlot] = useState(0);
+
+  const pos = positions?.[index] || { x: defaultX(index), y: defaultY(index), z: 0 };
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
+    el.style.zIndex = pos.z || 0;
+  }, [pos.x, pos.y, pos.z]);
+
+  function onPointerDown(e) {
+    // ignore right click
+    if (e.button === 2) return;
+    e.preventDefault();
+    const el = ref.current;
+    if (!el) return;
+
+    bringToFront(index);
+
+    const startX = e.clientX;
+    const startY = e.clientY;
+    draggingRef.current = {
+      pointerId: e.pointerId,
+      startX,
+      startY,
+      origX: pos.x,
+      origY: pos.y,
+      raf: null,
+    };
+
+    el.setPointerCapture(e.pointerId);
+
+    function onPointerMove(ev) {
+      ev.preventDefault();
+      const d = draggingRef.current;
+      if (!d) return;
+      const dx = ev.clientX - d.startX;
+      const dy = ev.clientY - d.startY;
+      const newX = d.origX + dx;
+      const newY = d.origY + dy;
+
+      // use rAF to update smoothly
+      if (d.raf) cancelAnimationFrame(d.raf);
+      d.raf = requestAnimationFrame(() => {
+        setPositions((prev) => ({ ...prev, [index]: { x: newX, y: newY, z: prev?.[index]?.z || 0 } }));
+      });
+    }
+
+    function onPointerUp(ev) {
+      ev.preventDefault();
+      const d = draggingRef.current;
+      if (d && d.raf) cancelAnimationFrame(d.raf);
+      try {
+        el.releasePointerCapture(d.pointerId);
+      } catch (err) {
+        // ignore
+      }
+      // persist final position
+      setPositions((prev) => ({ ...prev }));
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", onPointerUp);
+      window.removeEventListener("pointercancel", onPointerUp);
+      draggingRef.current = {};
+    }
+
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", onPointerUp);
+    window.addEventListener("pointercancel", onPointerUp);
+  }
+
+  function setBlockAt(slotIndex, blockId) {
+    const next = [...rules];
+    next[index] = { ...next[index], pattern: [...next[index].pattern] };
+    next[index].pattern[slotIndex] = blockId;
+    setRules(next);
+  }
+
+  function setPokemon(pokemonId) {
+    const next = [...rules];
+    next[index] = { ...next[index], pokemon: pokemonId };
+    setRules(next);
+  }
+
+  function setLevel(level) {
+    const next = [...rules];
+    next[index] = { ...next[index], level: Math.max(0, parseInt(level) || 0) };
+    setRules(next);
+  }
+
+  function removeBlock(slotIndex) {
+    setBlockAt(slotIndex, null);
+  }
+
+  function removePokemon() {
+    setPokemon(null);
+  }
+
+  return (
+    <div
+      ref={ref}
+      className="ruleCard"
+      onPointerDown={onPointerDown}
+      style={{ position: "absolute", touchAction: "none", width: 360, padding: 10, boxSizing: 'border-box' }}
+    >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          {/* preview blocks 3x3 */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 28px)', gridGap: 4, marginRight: 8 }}>
+            {(rule.pattern || Array(9).fill(null)).map((b, i) => (
+              <div key={i} style={{ width: 28, height: 28, background: '#fff', border: '1px solid #eee', borderRadius: 4, overflow: 'hidden' }}>
+                {b && <img src={getImage(b)} alt={b} style={{ width: '100%', height: '100%' }} />}
+              </div>
+            ))}
+          </div>
+
+          <div>
+            <div style={{ fontWeight: 600 }}>Règle #{index}</div>
+            <div style={{ fontSize: 12, color: "#444", display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ width: 28, height: 28 }}>
+                {rule.pokemon ? (
+                  <img src={getImage(rule.pokemon)} alt={rule.pokemon} style={{ width: '100%', height: '100%', borderRadius: 4 }} />
+                ) : null}
+              </div>
+              <div>
+                Pokémon : {rule.pokemon ? rule.pokemon : '—'} · Niveau : {rule.level ?? 0}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <button onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); setEditing((s) => !s); }}> {editing ? 'Fermer' : 'Éditer'} </button>
+        </div>
+      </div>
+
+      {editing && (
+        <div style={{ marginTop: 8 }} onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
+          <div style={{ display: 'flex', gap: 12 }}>
+            {/* Left: 3x3 block editor */}
+            <div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 48px)', gridGap: 6 }}>
+                {(rule.pattern || Array(9).fill(null)).map((b, i) => (
+                  <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <button
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onClick={(e) => { e.stopPropagation(); setActiveType('block'); setActiveSlot(i); }}
+                      style={{ width: 48, height: 48, padding: 2, border: activeType === 'block' && activeSlot === i ? '2px solid #2b6cdf' : '1px solid #ccc', borderRadius: 6, background: '#fff' }}
+                    >
+                      {b ? <img src={getImage(b)} alt={b} style={{ width: '100%', height: '100%' }} /> : <div style={{ fontSize: 10, color: '#666' }}>{i+1}</div>}
+                    </button>
+                    {b && <button onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); removeBlock(i); }} style={{ marginTop: 4, fontSize: 11 }}>X</button>}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right: pokemon + level + autocomplete */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 64, height: 64, border: '1px solid #eee', borderRadius: 6, overflow: 'hidden' }}>
+                  {rule.pokemon ? <img src={getImage(rule.pokemon)} alt={rule.pokemon} style={{ width: '100%', height: '100%' }} /> : <div style={{ padding: 8, color: '#666' }}>Pokémon</div>}
+                </div>
+                <div>
+                  <div style={{ fontSize: 12 }}>Pokémon</div>
+                  <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                    <button onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); setActiveType('pokemon'); }}>Choisir</button>
+                    {rule.pokemon && <button onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); removePokemon(); }}>Suppr</button>}
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: 12 }}>Niveau</div>
+                <input
+                  type="number"
+                  value={rule.level ?? 0}
+                  onChange={(e) => setLevel(e.target.value)}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  style={{ width: 120, padding: 6 }}
+                />
+              </div>
+
+              <div>
+                <div style={{ fontSize: 12, marginBottom: 6 }}>Recherche</div>
+                {activeType === 'pokemon' ? (
+                  <PokemonAutocomplete
+                    value={rule.pokemon || ''}
+                    suggestions={pokemonSuggestions}
+                    onSelect={(p) => { setPokemon(p); }}
+                    placeholder={`Choisir Pokémon`}
+                  />
+                ) : (
+                  <PokemonAutocomplete
+                    value={rule.pattern[activeSlot] || ''}
+                    suggestions={blockSuggestions}
+                    onSelect={(b) => { setBlockAt(activeSlot, b); }}
+                    placeholder={`Choisir bloc`}
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function defaultX(index) {
+  return 20 + (index % 5) * 240;
+}
+function defaultY(index) {
+  return 20 + Math.floor(index / 5) * 160;
+}
+
 export default function App() {
-  const createRule = () => ({
-    pattern: Array(9).fill(null),
-    pokemons: Array(5).fill(null),
+  const createRule = () => ({ pattern: Array(9).fill(null), pokemon: null, level: 0 });
+  const [rules, setRules] = useState(Array(100).fill(null).map(createRule));
+
+  const [blockFilter, setBlockFilter] = useState("");
+  const [pokemonFilter, setPokemonFilter] = useState("");
+
+  // positions: { [index]: { x, y, z } }
+  const [positions, setPositions] = useState(() => {
+    try {
+      const raw = localStorage.getItem(LAYOUT_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.positions) return parsed.positions;
+      }
+    } catch (err) {
+      // ignore
+    }
+    // default positions for initial load
+    const obj = {};
+    for (let i = 0; i < 100; i++) {
+      obj[i] = { x: defaultX(i), y: defaultY(i), z: 0 };
+    }
+    return obj;
   });
 
-  const [rules, setRules] = useState(Array(100).fill(null).map(createRule));
+  // track z-order
+  const zRef = useRef(1);
+  function bringToFront(index) {
+    setPositions((prev) => {
+      const next = { ...(prev || {}) };
+      next[index] = { ...(next[index] || {}), z: ++zRef.current };
+      // persist
+      localStorage.setItem(LAYOUT_KEY, JSON.stringify({ version: 1, positions: next, updatedAt: Date.now() }));
+      return next;
+    });
+  }
+
+  // save positions when they change (debounced)
+  useEffect(() => {
+    const id = setTimeout(() => {
+      try {
+        localStorage.setItem(LAYOUT_KEY, JSON.stringify({ version: 1, positions, updatedAt: Date.now() }));
+      } catch (err) {
+        console.error("Erreur sauvegarde layout", err);
+      }
+    }, 250);
+    return () => clearTimeout(id);
+  }, [positions]);
 
   // -------------------------------
   // Fonction import JSON
@@ -197,14 +604,12 @@ export default function App() {
               ?.slice(0, 9)
               .concat(Array(9 - (r.pattern?.length || 0)).fill(null)) ||
             Array(9).fill(null),
-          pokemons:
-            r.pokemons
-              ?.slice(0, 5)
-              .concat(Array(5 - (r.pokemons?.length || 0)).fill(null)) ||
-            Array(5).fill(null),
+          // support ancien format (pokemons array) ou nouveau (pokemon string)
+          pokemon: r.pokemon || (Array.isArray(r.pokemons) ? r.pokemons[0] : null) || null,
+          level: r.level ?? r.niveau ?? 0,
         }));
 
-        setRules(importedRules); // ✅ ici setRules existe
+        setRules(importedRules);
       } catch (err) {
         console.error(err);
         alert("Erreur en lisant le fichier JSON : " + err.message);
@@ -247,84 +652,132 @@ export default function App() {
     a.click();
   }
 
-  // Juste après exportJSON(), dans le composant App
-  const [blockFilter, setBlockFilter] = useState("");
-  const [pokemonFilter, setPokemonFilter] = useState("");
+  function exportLayout() {
+    try {
+      const json = JSON.stringify({ version: 1, positions, updatedAt: Date.now() }, null, 2);
+      const blob = new Blob([json], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "habitats-layout.json";
+      a.click();
+    } catch (err) {
+      console.error(err);
+      alert("Erreur export layout");
+    }
+  }
 
-  // Blocs et Pokémon filtrés
-  const filteredBlocks = BLOCKS.filter((b) =>
-    b.includes(blockFilter.toLowerCase()),
-  );
-  const filteredPokemons = POKEMONS.filter((p) =>
-    p.includes(pokemonFilter.toLowerCase()),
-  );
+  function importLayout(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (!data.positions) throw new Error("Format invalide: positions manquantes");
+        setPositions(data.positions);
+        localStorage.setItem(LAYOUT_KEY, JSON.stringify({ version: 1, positions: data.positions, updatedAt: Date.now() }));
+      } catch (err) {
+        console.error(err);
+        alert("Erreur en lisant le layout JSON : " + err.message);
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function resetLayout() {
+    const obj = {};
+    for (let i = 0; i < rules.length; i++) obj[i] = { x: defaultX(i), y: defaultY(i), z: 0 };
+    setPositions(obj);
+    localStorage.setItem(LAYOUT_KEY, JSON.stringify({ version: 1, positions: obj, updatedAt: Date.now() }));
+  }
+
+  const filteredBlocks = BLOCKS.filter((b) => b.includes(blockFilter.toLowerCase()));
+  const filteredPokemons = POKEMONS.filter((p) => p.includes(pokemonFilter.toLowerCase()));
+
+  // canvas size - large area to simulate 'infinite' space
+  const canvasStyle = {
+    width: 4000,
+    height: 3000,
+    position: "relative",
+    background: "linear-gradient(90deg, #f8f9fa 0.5px, transparent 0.5px), linear-gradient(#f8f9fa 0.5px, transparent 0.5px)",
+    backgroundSize: "20px 20px",
+    border: "1px solid #ddd",
+  };
 
   return (
     <DndContext onDragEnd={handleDragEnd}>
-      <div className="app">
-        <div class="container">
-          <div class="pp">
-            <input
-              type="text"
-              placeholder="Filtrer blocs..."
-              value={blockFilter}
-              onChange={(e) => setBlockFilter(e.target.value)}
-              style={{ marginBottom: 5, width: "100%" }}
-            />
-            <div className="palette">
-              {filteredBlocks.map((b) => (
-                <Draggable key={b} id={`block|${b}`} label={b} />
-              ))}
-            </div>
+      <div className="app" style={{ display: "flex", gap: 20 }}>
+        <div style={{ width: 320 }}>
+          <h2>Palette Blocs</h2>
+          <input
+            type="text"
+            placeholder="Filtrer blocs..."
+            value={blockFilter}
+            onChange={(e) => setBlockFilter(e.target.value)}
+            style={{ marginBottom: 5, width: "100%" }}
+          />
+          <div className="palette" style={{ maxHeight: 300, overflow: "auto" }}>
+            {filteredBlocks.map((b) => (
+              <Draggable key={b} id={`block|${b}`} label={b} />
+            ))}
           </div>
-          <div class="pp">
-            <input
-              type="text"
-              placeholder="Filtrer Pokémon..."
-              value={pokemonFilter}
-              onChange={(e) => setPokemonFilter(e.target.value)}
-              style={{ marginBottom: 5, width: "100%" }}
-            />
-            <div className="palette">
-              {filteredPokemons.map((p) => (
-                <Draggable key={p} id={`pokemon|${p}`} label={p} />
-              ))}
-            </div>
+
+          <h2>Palette Pokémon</h2>
+          <input
+            type="text"
+            placeholder="Filtrer Pokémon..."
+            value={pokemonFilter}
+            onChange={(e) => setPokemonFilter(e.target.value)}
+            style={{ marginBottom: 5, width: "100%" }}
+          />
+          <div className="palette" style={{ maxHeight: 300, overflow: "auto" }}>
+            {filteredPokemons.map((p) => (
+              <Draggable key={p} id={`pokemon|${p}`} label={p} />
+            ))}
           </div>
-          <div class="pp">
-            <div className="rules">
+
+          <div style={{ margin: "10px 0" }}>
+            <button onClick={exportJSON}>Exporter JSON (rules)</button>
+            <button style={{ marginLeft: 8 }} onClick={exportLayout}>Exporter layout</button>
+
+            {/* Import JSON */}
+            <label style={{ marginLeft: 10, cursor: "pointer", color: "blue" }}>
+              Importer JSON
+              <input
+                type="file"
+                accept=".json"
+                onChange={importJSON}
+                style={{ display: "none" }}
+              />
+            </label>
+
+            <label style={{ marginLeft: 10, cursor: "pointer", color: "blue" }}>
+              Importer layout
+              <input type="file" accept=".json" onChange={importLayout} style={{ display: "none" }} />
+            </label>
+
+            <button style={{ marginLeft: 10 }} onClick={resetLayout}>Reset layout</button>
+          </div>
+        </div>
+
+        <div style={{ flex: 1 }}>
+          <h2>Canvas libre (déplacez les cartes)</h2>
+          <div style={{ width: "100%", height: "80vh", overflow: "auto", border: "1px solid #ccc" }}>
+            <div style={canvasStyle}>
               {rules.map((rule, rIndex) => (
-                <div key={rIndex} className="ruleRow">
-                  <div className="grid">
-                    {rule.pattern.map((v, i) => (
-                      <Slot key={i} id={`slot|${rIndex}|${i}`} value={v} />
-                    ))}
-                  </div>
-
-                  <div className="pokeSlots">
-                    {rule.pokemons.map((v, i) => (
-                      <Slot key={i} id={`slot|${rIndex}|${i + 9}`} value={v} />
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div style={{ margin: "10px 0" }}>
-              <button onClick={exportJSON}>Exporter JSON</button>
-
-              {/* Import JSON */}
-              <label
-                style={{ marginLeft: 10, cursor: "pointer", color: "blue" }}
-              >
-                Importer JSON
-                <input
-                  type="file"
-                  accept=".json"
-                  onChange={importJSON}
-                  style={{ display: "none" }}
+                <RuleCard
+                  key={rIndex}
+                  index={rIndex}
+                  rule={rule}
+                  positions={positions}
+                  setPositions={setPositions}
+                  bringToFront={bringToFront}
+                  rules={rules}
+                  setRules={setRules}
+                  pokemonSuggestions={filteredPokemons}
+                  blockSuggestions={filteredBlocks}
                 />
-              </label>
+              ))}
             </div>
           </div>
         </div>
@@ -332,5 +785,3 @@ export default function App() {
     </DndContext>
   );
 }
-
-// Juste après exportJSON(), ajoute :
