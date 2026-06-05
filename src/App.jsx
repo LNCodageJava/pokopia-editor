@@ -474,34 +474,10 @@ export default function App() {
 
   // pointer handlers for drawing shapes on the canvas
   function canvasPointerDown(e) {
-    // only handle left mouse button for drawing/creating text
+    // only handle left mouse button for drawing
     if (!canvasRef.current) return;
     if (e.button !== 0) return;
-    if (tool === "select") return; // nothing
-    if (tool === "text") {
-      // create text at click position
-      const rect = canvasRef.current.getBoundingClientRect();
-      const x = e.clientX - rect.left + canvasRef.current.scrollLeft;
-      const y = e.clientY - rect.top + canvasRef.current.scrollTop;
-      const text = prompt("Enter text");
-      if (text) {
-        const id = "shape_" + Date.now();
-        setShapes((prev) =>
-          prev.concat({
-            id,
-            type: "text",
-            x1: x,
-            y1: y,
-            text,
-            fontSize: 14,
-            fill: "#111",
-          }),
-        );
-      }
-      // revert to select tool
-      setTool("select");
-      return;
-    }
+    if (tool === "select" || tool === "text") return; // text handled by global click
 
     // only start drawing when clicking on canvas background
     const rect = canvasRef.current.getBoundingClientRect();
@@ -590,45 +566,84 @@ export default function App() {
     setRules(newRules);
   }
 
+  // Gestionnaire de clic global pour créer du texte
+  const handleGlobalClick = (e) => {
+    if (tool !== "text") return;
+    if (!canvasRef.current) return;
+    // Ignorer les clics sur les boutons et inputs
+    if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
+
+    const rect = canvasRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left + canvasRef.current.scrollLeft;
+    const y = e.clientY - rect.top + canvasRef.current.scrollTop;
+    const text = prompt("Enter text");
+    if (text) {
+      const id = "shape_" + Date.now();
+      setShapes((prev) =>
+        prev.concat({
+          id,
+          type: "textbox",
+          x1: x,
+          y1: y,
+          text,
+        }),
+      );
+    }
+    setTool("select");
+  };
+
   return (
     <DndContext onDragEnd={handleDragEnd}>
-      <div className="app" style={{ display: "flex", gap: 20 }}>
+      {/* Bandeau fixe en haut pour les outils */}
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: '#f5f5f5',
+        borderBottom: '2px solid #ccc',
+        padding: '10px 20px',
+        display: 'flex',
+        gap: 10,
+        alignItems: 'center',
+        zIndex: 10000,
+      }}>
+        <span style={{ fontWeight: 'bold', marginRight: 10 }}>Outils:</span>
+        <button
+          onClick={() => setTool("select")}
+          className={tool === "select" ? "active" : ""}
+        >
+          Select
+        </button>
+        <button
+          onClick={() => setTool("rect")}
+          className={tool === "rect" ? "active" : ""}
+        >
+          Rect
+        </button>
+        <button
+          onClick={() => setTool("arrow")}
+          className={tool === "arrow" ? "active" : ""}
+        >
+          Arrow
+        </button>
+        <button
+          onClick={() => setTool("text")}
+          className={tool === "text" ? "active" : ""}
+        >
+          Text
+        </button>
+        <button
+          onClick={() => {
+            setShapes([]);
+          }}
+        >
+          Clear shapes
+        </button>
+      </div>
+
+      <div className="app" style={{ display: "flex", gap: 20, marginTop: 60 }} onClick={handleGlobalClick}>
         <div style={{ width: 320 }}>
-          <div style={{ marginBottom: 10 }}>
-            <div style={{ display: "flex", gap: 6 }}>
-              <button
-                onClick={() => setTool("select")}
-                className={tool === "select" ? "active" : ""}
-              >
-                Select
-              </button>
-              <button
-                onClick={() => setTool("rect")}
-                className={tool === "rect" ? "active" : ""}
-              >
-                Rect
-              </button>
-              <button
-                onClick={() => setTool("arrow")}
-                className={tool === "arrow" ? "active" : ""}
-              >
-                Arrow
-              </button>
-              <button
-                onClick={() => setTool("text")}
-                className={tool === "text" ? "active" : ""}
-              >
-                Text
-              </button>
-              <button
-                onClick={() => {
-                  setShapes([]);
-                }}
-              >
-                Clear shapes
-              </button>
-            </div>
-          </div>
 
           <h2>Palette Blocs</h2>
           <input
@@ -803,7 +818,7 @@ export default function App() {
                         const sh = shapes.find(
                           (s) => s.id === shapeMenu.shapeId,
                         );
-                        if (sh && sh.type === "text") {
+                        if (sh && (sh.type === "text" || sh.type === "textbox")) {
                           const newText = prompt("Edit text", sh.text || "");
                           if (newText !== null)
                             setShapes((prev) =>
@@ -824,11 +839,10 @@ export default function App() {
                             setShapes((prev) =>
                               prev.concat({
                                 id: "shape_" + Date.now(),
-                                type: "text",
+                                type: "textbox",
                                 x1: midX,
                                 y1: midY,
                                 text,
-                                fontSize: 14,
                               }),
                             );
                         }
