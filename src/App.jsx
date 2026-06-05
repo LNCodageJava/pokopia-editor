@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { DndContext, useDraggable, useDroppable } from "@dnd-kit/core";
 import "./App.css";
 import RuleCard from "./components/RuleCard";
+import ShapesLayer from "./components/ShapesLayer";
+import ImageWithFallback from "./components/ImageWithFallback";
 
 const LAYOUT_KEY = "pokopia.rules.layout.v1";
 
@@ -290,7 +292,12 @@ function Draggable({ id, label }) {
       style={style}
       className="item"
     >
-      <img src={getImage(label)} alt={label} className="img" />
+      <ImageWithFallback
+        src={getImage(label)}
+        labelId={label}
+        alt={label}
+        className="img"
+      />
       <div className="label">{label}</div>
     </div>
   );
@@ -301,7 +308,14 @@ function Slot({ id, value }) {
 
   return (
     <div ref={setNodeRef} className="slot">
-      {value && <img src={getImage(value)} alt={value} className="img" />}
+      {value && (
+        <ImageWithFallback
+          src={getImage(value)}
+          labelId={value}
+          alt={value}
+          className="img"
+        />
+      )}
     </div>
   );
 }
@@ -314,10 +328,38 @@ function defaultY(index) {
 }
 
 export default function App() {
-  const createRule = () => ({ pattern: Array(9).fill(null), pokemon: null, level: 0 });
+  const createRule = () => ({
+    pattern: Array(9).fill(null),
+    pokemon: null,
+    level: 0,
+  });
   const [rules, setRules] = useState(Array(100).fill(null).map(createRule));
   // selected cards (array of indices)
   const [selected, setSelected] = useState([]);
+  // shapes drawn on canvas (rect or arrow)
+  const [shapes, setShapes] = useState(() => {
+    try {
+      const raw = localStorage.getItem(LAYOUT_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.shapes) return parsed.shapes;
+      }
+    } catch (err) {}
+    return [];
+  });
+
+  const [tool, setTool] = useState("select"); // 'select' | 'rect' | 'arrow' | 'text'
+  const canvasRef = useRef(null);
+  const drawingRef = useRef(null); // temp state while drawing
+  // context menu for shapes
+  const [shapeMenu, setShapeMenu] = useState({
+    visible: false,
+    x: 0,
+    y: 0,
+    shapeId: null,
+  });
+  // context menu for canvas background (tool picker)
+  const [canvasMenu, setCanvasMenu] = useState({ visible: false, x: 0, y: 0 });
 
   const [blockFilter, setBlockFilter] = useState("");
   const [pokemonFilter, setPokemonFilter] = useState("");
@@ -346,13 +388,22 @@ export default function App() {
   function bringToFront(indexOrArray) {
     setPositions((prev) => {
       const next = { ...(prev || {}) };
-      const indices = Array.isArray(indexOrArray) ? indexOrArray : [indexOrArray];
+      const indices = Array.isArray(indexOrArray)
+        ? indexOrArray
+        : [indexOrArray];
       indices.forEach((i) => {
         next[i] = { ...(next[i] || {}), z: ++zRef.current };
       });
       // persist
       try {
-        localStorage.setItem(LAYOUT_KEY, JSON.stringify({ version: 1, positions: next, updatedAt: Date.now() }));
+        localStorage.setItem(
+          LAYOUT_KEY,
+          JSON.stringify({
+            version: 1,
+            positions: next,
+            updatedAt: Date.now(),
+          }),
+        );
       } catch (err) {}
       return next;
     });
@@ -362,13 +413,38 @@ export default function App() {
   useEffect(() => {
     const id = setTimeout(() => {
       try {
-        localStorage.setItem(LAYOUT_KEY, JSON.stringify({ version: 1, positions, updatedAt: Date.now() }));
+        localStorage.setItem(
+          LAYOUT_KEY,
+          JSON.stringify({
+            version: 1,
+            positions,
+            shapes,
+            updatedAt: Date.now(),
+          }),
+        );
       } catch (err) {
         console.error("Erreur sauvegarde layout", err);
       }
     }, 250);
     return () => clearTimeout(id);
   }, [positions]);
+
+  // persist shapes too when they change
+  useEffect(() => {
+    const id = setTimeout(() => {
+      try {
+        const raw = localStorage.getItem(LAYOUT_KEY);
+        const parsed = raw ? JSON.parse(raw) : {};
+        parsed.positions = positions;
+        parsed.shapes = shapes;
+        parsed.updatedAt = Date.now();
+        localStorage.setItem(LAYOUT_KEY, JSON.stringify(parsed));
+      } catch (err) {
+        console.error("Erreur sauvegarde shapes", err);
+      }
+    }, 250);
+    return () => clearTimeout(id);
+  }, [shapes, positions]);
 
   // -------------------------------
   // Fonction import JSON
@@ -385,7 +461,9 @@ export default function App() {
         // Support new pokopia_data structure: { habitats: [ { name, hab, lvl }, ... ] }
         if (data && Array.isArray(data.habitats)) {
           const importedRules = data.habitats.map((h) => ({
-            pattern: (Array.isArray(h.hab) ? h.hab.slice(0, 9).concat(Array(9 - h.hab.length).fill(null)) : Array(9).fill(null)),
+            pattern: Array.isArray(h.hab)
+              ? h.hab.slice(0, 9).concat(Array(9 - h.hab.length).fill(null))
+              : Array(9).fill(null),
             pokemon: h.name || null,
             // preserve lvl as-is (string or number)
             level: h.lvl ?? 0,
@@ -410,7 +488,10 @@ export default function App() {
               .concat(Array(9 - (r.pattern?.length || 0)).fill(null)) ||
             Array(9).fill(null),
           // support ancien format (pokemons array) ou nouveau (pokemon string)
-          pokemon: r.pokemon || (Array.isArray(r.pokemons) ? r.pokemons[0] : null) || null,
+          pokemon:
+            r.pokemon ||
+            (Array.isArray(r.pokemons) ? r.pokemons[0] : null) ||
+            null,
           level: r.level ?? r.niveau ?? 0,
         }));
 
@@ -450,7 +531,11 @@ export default function App() {
 
   function exportLayout() {
     try {
-      const json = JSON.stringify({ version: 1, positions, updatedAt: Date.now() }, null, 2);
+      const json = JSON.stringify(
+        { version: 1, positions, shapes, updatedAt: Date.now() },
+        null,
+        2,
+      );
       const blob = new Blob([json], { type: "application/json" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
@@ -469,9 +554,20 @@ export default function App() {
     reader.onload = (ev) => {
       try {
         const data = JSON.parse(ev.target.result);
-        if (!data.positions) throw new Error("Format invalide: positions manquantes");
+        if (!data.positions)
+          throw new Error("Format invalide: positions manquantes");
         setPositions(data.positions);
-        localStorage.setItem(LAYOUT_KEY, JSON.stringify({ version: 1, positions: data.positions, updatedAt: Date.now() }));
+        // load shapes if present
+        if (Array.isArray(data.shapes)) setShapes(data.shapes);
+        localStorage.setItem(
+          LAYOUT_KEY,
+          JSON.stringify({
+            version: 1,
+            positions: data.positions,
+            shapes: data.shapes || [],
+            updatedAt: Date.now(),
+          }),
+        );
       } catch (err) {
         console.error(err);
         alert("Erreur en lisant le layout JSON : " + err.message);
@@ -482,23 +578,116 @@ export default function App() {
 
   function resetLayout() {
     const obj = {};
-    for (let i = 0; i < rules.length; i++) obj[i] = { x: defaultX(i), y: defaultY(i), z: 0 };
+    for (let i = 0; i < rules.length; i++)
+      obj[i] = { x: defaultX(i), y: defaultY(i), z: 0 };
     setPositions(obj);
-    localStorage.setItem(LAYOUT_KEY, JSON.stringify({ version: 1, positions: obj, updatedAt: Date.now() }));
+    setShapes([]);
+    localStorage.setItem(
+      LAYOUT_KEY,
+      JSON.stringify({ version: 1, positions: obj, updatedAt: Date.now() }),
+    );
   }
 
-  const filteredBlocks = BLOCKS.filter((b) => b.includes(blockFilter.toLowerCase()));
-  const filteredPokemons = POKEMONS.filter((p) => p.includes(pokemonFilter.toLowerCase()));
+  const filteredBlocks = BLOCKS.filter((b) =>
+    b.includes(blockFilter.toLowerCase()),
+  );
+  const filteredPokemons = POKEMONS.filter((p) =>
+    p.includes(pokemonFilter.toLowerCase()),
+  );
 
   // canvas size - large area to simulate 'infinite' space
   const canvasStyle = {
     width: 4000,
     height: 3000,
     position: "relative",
-    background: "linear-gradient(90deg, #f8f9fa 0.5px, transparent 0.5px), linear-gradient(#f8f9fa 0.5px, transparent 0.5px)",
+    background:
+      "linear-gradient(90deg, #f8f9fa 0.5px, transparent 0.5px), linear-gradient(#f8f9fa 0.5px, transparent 0.5px)",
     backgroundSize: "20px 20px",
     border: "1px solid #ddd",
   };
+
+  // pointer handlers for drawing shapes on the canvas
+  function canvasPointerDown(e) {
+    // only handle left mouse button for drawing/creating text
+    if (!canvasRef.current) return;
+    if (e.button !== 0) return;
+    if (tool === "select") return; // nothing
+    if (tool === "text") {
+      // create text at click position
+      const rect = canvasRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left + canvasRef.current.scrollLeft;
+      const y = e.clientY - rect.top + canvasRef.current.scrollTop;
+      const text = prompt("Enter text");
+      if (text) {
+        const id = "shape_" + Date.now();
+        setShapes((prev) =>
+          prev.concat({
+            id,
+            type: "text",
+            x1: x,
+            y1: y,
+            text,
+            fontSize: 14,
+            fill: "#111",
+          }),
+        );
+      }
+      // revert to select tool
+      setTool("select");
+      return;
+    }
+
+    // only start drawing when clicking on canvas background
+    const rect = canvasRef.current.getBoundingClientRect();
+    const startX = e.clientX - rect.left + canvasRef.current.scrollLeft;
+    const startY = e.clientY - rect.top + canvasRef.current.scrollTop;
+    drawingRef.current = { startX, startY, tool };
+
+    function onMove(ev) {
+      const curX = ev.clientX - rect.left + canvasRef.current.scrollLeft;
+      const curY = ev.clientY - rect.top + canvasRef.current.scrollTop;
+      drawingRef.current.endX = curX;
+      drawingRef.current.endY = curY;
+      // set a temporary preview shape
+      const preview = {
+        id: "__preview",
+        type: tool === "rect" ? "rect" : "arrow",
+        x1: drawingRef.current.startX,
+        y1: drawingRef.current.startY,
+        x2: curX,
+        y2: curY,
+        stroke: "#2b6cdf",
+      };
+      setShapes((prev) => {
+        const others = prev.filter((s) => s.id !== "__preview");
+        return [...others, preview];
+      });
+    }
+
+    function onUp(ev) {
+      const curX = ev.clientX - rect.left + canvasRef.current.scrollLeft;
+      const curY = ev.clientY - rect.top + canvasRef.current.scrollTop;
+      const id = "shape_" + Date.now();
+      const final = {
+        id,
+        type: drawingRef.current.tool === "rect" ? "rect" : "arrow",
+        x1: drawingRef.current.startX,
+        y1: drawingRef.current.startY,
+        x2: curX,
+        y2: curY,
+        stroke: "#2b6cdf",
+      };
+      setShapes((prev) =>
+        prev.filter((s) => s.id !== "__preview").concat(final),
+      );
+      drawingRef.current = null;
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+    }
+
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+  }
 
   // handle drag from palettes into card slots
   function handleDragEnd(event) {
@@ -516,13 +705,19 @@ export default function App() {
     const newRules = [...rules];
 
     if (type === "block" && slotIndex < 9) {
-      newRules[ruleIndex] = { ...newRules[ruleIndex], pattern: [...(newRules[ruleIndex].pattern || Array(9).fill(null))] };
+      newRules[ruleIndex] = {
+        ...newRules[ruleIndex],
+        pattern: [...(newRules[ruleIndex].pattern || Array(9).fill(null))],
+      };
       newRules[ruleIndex].pattern[slotIndex] = value;
     }
 
     if (type === "pokemon" && slotIndex >= 9) {
       // if there were multiple pokemon slots previously, keep backward compatibility
-      newRules[ruleIndex] = { ...newRules[ruleIndex], pokemons: [...(newRules[ruleIndex].pokemons || [])] };
+      newRules[ruleIndex] = {
+        ...newRules[ruleIndex],
+        pokemons: [...(newRules[ruleIndex].pokemons || [])],
+      };
       newRules[ruleIndex].pokemons[slotIndex - 9] = value;
     }
 
@@ -533,6 +728,42 @@ export default function App() {
     <DndContext onDragEnd={handleDragEnd}>
       <div className="app" style={{ display: "flex", gap: 20 }}>
         <div style={{ width: 320 }}>
+          <div style={{ marginBottom: 10 }}>
+            <div style={{ display: "flex", gap: 6 }}>
+              <button
+                onClick={() => setTool("select")}
+                className={tool === "select" ? "active" : ""}
+              >
+                Select
+              </button>
+              <button
+                onClick={() => setTool("rect")}
+                className={tool === "rect" ? "active" : ""}
+              >
+                Rect
+              </button>
+              <button
+                onClick={() => setTool("arrow")}
+                className={tool === "arrow" ? "active" : ""}
+              >
+                Arrow
+              </button>
+              <button
+                onClick={() => setTool("text")}
+                className={tool === "text" ? "active" : ""}
+              >
+                Text
+              </button>
+              <button
+                onClick={() => {
+                  setShapes([]);
+                }}
+              >
+                Clear shapes
+              </button>
+            </div>
+          </div>
+
           <h2>Palette Blocs</h2>
           <input
             type="text"
@@ -563,7 +794,9 @@ export default function App() {
 
           <div style={{ margin: "10px 0" }}>
             <button onClick={exportJSON}>Exporter JSON (rules)</button>
-            <button style={{ marginLeft: 8 }} onClick={exportLayout}>Exporter layout</button>
+            <button style={{ marginLeft: 8 }} onClick={exportLayout}>
+              Exporter layout
+            </button>
 
             {/* Import JSON */}
             <label style={{ marginLeft: 10, cursor: "pointer", color: "blue" }}>
@@ -578,30 +811,78 @@ export default function App() {
 
             <label style={{ marginLeft: 10, cursor: "pointer", color: "blue" }}>
               Importer layout
-              <input type="file" accept=".json" onChange={importLayout} style={{ display: "none" }} />
+              <input
+                type="file"
+                accept=".json"
+                onChange={importLayout}
+                style={{ display: "none" }}
+              />
             </label>
 
-            <button style={{ marginLeft: 10 }} onClick={resetLayout}>Reset layout</button>
+            <button style={{ marginLeft: 10 }} onClick={resetLayout}>
+              Reset layout
+            </button>
           </div>
         </div>
 
         <div style={{ flex: 1 }}>
           <h2>Canvas libre (déplacez les cartes)</h2>
           <div
-            style={{ width: "100%", height: "80vh", overflow: "auto", border: "1px solid #ccc" }}
+            ref={canvasRef}
+            style={{
+              width: "100%",
+              height: "80vh",
+              overflow: "auto",
+              border: "1px solid #ccc",
+              cursor:
+                tool === "select"
+                  ? "default"
+                  : tool === "text"
+                    ? "text"
+                    : "crosshair",
+            }}
             onPointerDown={(e) => {
-              // if click is outside any card, clear selection
-              try {
-                const el = e.target;
-                if (!el || !el.closest || !el.closest('.ruleCard')) {
+              // left click: clear selection if outside card and possibly start drawing
+              if (e.button === 0) {
+                try {
+                  const el = e.target;
+                  if (!el || !el.closest || !el.closest(".ruleCard")) {
+                    setSelected([]);
+                  }
+                } catch (err) {
                   setSelected([]);
                 }
-              } catch (err) {
-                setSelected([]);
+                // if tool is drawing, start drawing
+                canvasPointerDown(e);
               }
+              // right click handled by onContextMenu below
+            }}
+            onContextMenu={(e) => {
+              e.preventDefault();
+              // open canvas tool menu only when right-clicking on background (not on cards or shapes)
+              const el = e.target;
+              if (el && el.closest && el.closest(".ruleCard")) return;
+              // close any shape menu
+              setShapeMenu({ visible: false, x: 0, y: 0, shapeId: null });
+              const rect = canvasRef.current.getBoundingClientRect();
+              const x = e.clientX - rect.left + canvasRef.current.scrollLeft;
+              const y = e.clientY - rect.top + canvasRef.current.scrollTop;
+              setCanvasMenu({ visible: true, x, y });
             }}
           >
             <div style={canvasStyle}>
+              {/* shapes layer */}
+              <ShapesLayer
+                shapes={shapes}
+                onShapeContext={(shape, e) => {
+                  // open menu at pointer location
+                  const canvasRect = canvasRef.current?.getBoundingClientRect();
+                  const x = e.clientX - (canvasRect?.left || 0);
+                  const y = e.clientY - (canvasRect?.top || 0);
+                  setShapeMenu({ visible: true, x, y, shapeId: shape.id });
+                }}
+              />
+
               {rules.map((rule, rIndex) => (
                 <RuleCard
                   key={rIndex}
@@ -618,6 +899,156 @@ export default function App() {
                   blockSuggestions={filteredBlocks}
                 />
               ))}
+              {/* context menu for shapes */}
+              {shapeMenu.visible && (
+                <div
+                  style={{
+                    position: "absolute",
+                    left: shapeMenu.x,
+                    top: shapeMenu.y,
+                    background: "#fff",
+                    border: "1px solid #ccc",
+                    zIndex: 9999,
+                    padding: 6,
+                  }}
+                >
+                  <div
+                    style={{ display: "flex", flexDirection: "column", gap: 6 }}
+                  >
+                    <button
+                      onClick={() => {
+                        // delete shape
+                        setShapes((prev) =>
+                          prev.filter((s) => s.id !== shapeMenu.shapeId),
+                        );
+                        setShapeMenu({
+                          visible: false,
+                          x: 0,
+                          y: 0,
+                          shapeId: null,
+                        });
+                      }}
+                    >
+                      Delete
+                    </button>
+                    <button
+                      onClick={() => {
+                        // edit text: find shape and prompt new text
+                        const sh = shapes.find(
+                          (s) => s.id === shapeMenu.shapeId,
+                        );
+                        if (sh && sh.type === "text") {
+                          const newText = prompt("Edit text", sh.text || "");
+                          if (newText !== null)
+                            setShapes((prev) =>
+                              prev.map((s) =>
+                                s.id === sh.id ? { ...s, text: newText } : s,
+                              ),
+                            );
+                        } else if (sh) {
+                          // convert shape to text at its midpoint
+                          const midX = Math.round(
+                            ((sh.x1 || sh.x) + (sh.x2 || sh.x)) / 2,
+                          );
+                          const midY = Math.round(
+                            ((sh.y1 || sh.y) + (sh.y2 || sh.y)) / 2,
+                          );
+                          const text = prompt("Enter text");
+                          if (text)
+                            setShapes((prev) =>
+                              prev.concat({
+                                id: "shape_" + Date.now(),
+                                type: "text",
+                                x1: midX,
+                                y1: midY,
+                                text,
+                                fontSize: 14,
+                              }),
+                            );
+                        }
+                        setShapeMenu({
+                          visible: false,
+                          x: 0,
+                          y: 0,
+                          shapeId: null,
+                        });
+                      }}
+                    >
+                      Edit Text
+                    </button>
+                    <button
+                      onClick={() =>
+                        setShapeMenu({
+                          visible: false,
+                          x: 0,
+                          y: 0,
+                          shapeId: null,
+                        })
+                      }
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              )}
+              {/* canvas context menu for tool selection */}
+              {canvasMenu.visible && (
+                <div
+                  style={{
+                    position: "absolute",
+                    left: canvasMenu.x,
+                    top: canvasMenu.y,
+                    background: "#fff",
+                    border: "1px solid #ccc",
+                    zIndex: 9999,
+                    padding: 6,
+                  }}
+                >
+                  <div
+                    style={{ display: "flex", flexDirection: "column", gap: 6 }}
+                  >
+                    <button
+                      onClick={() => {
+                        setTool("select");
+                        setCanvasMenu({ visible: false, x: 0, y: 0 });
+                      }}
+                    >
+                      Select
+                    </button>
+                    <button
+                      onClick={() => {
+                        setTool("rect");
+                        setCanvasMenu({ visible: false, x: 0, y: 0 });
+                      }}
+                    >
+                      Rect
+                    </button>
+                    <button
+                      onClick={() => {
+                        setTool("arrow");
+                        setCanvasMenu({ visible: false, x: 0, y: 0 });
+                      }}
+                    >
+                      Arrow
+                    </button>
+                    <button
+                      onClick={() => {
+                        setTool("text");
+                        setCanvasMenu({ visible: false, x: 0, y: 0 });
+                      }}
+                    >
+                      Text
+                    </button>
+                    <button
+                      onClick={() =>
+                        setCanvasMenu({ visible: false, x: 0, y: 0 })
+                      }
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

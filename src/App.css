@@ -2,7 +2,7 @@
   width: 40px;
   height: 40px;
   object-fit: contain;
-  image-rendering: 'pixelated'
+  image-rendering: "pixelated";
 }
 
 .app {
@@ -61,7 +61,9 @@
   width: 40px;
   height: 40px;
   object-fit: none;
-  image-rendering: 'pixelated'
+  image-rendering: "pixelated";
+  font-size: 11px;
+  line-height: 1;
 }
 
 .overlay {
