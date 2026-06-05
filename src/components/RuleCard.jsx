@@ -5,9 +5,10 @@ import "../RuleCard.css";
 
 function getImage(id) {
   if (!id) return null;
-  if (id.startsWith("minecraft:")) {
-    const name = id.split(":")[1];
-    return `/blocks/${name}.png`;
+  if (id.includes(":")) {
+    // Format namespace:nom_block -> namespace__nom_block.png
+    const imageName = id.replace(":", "__");
+    return `/blocks/${imageName}.png`;
   } else {
     return `/pokemon/${id}.png`;
   }
