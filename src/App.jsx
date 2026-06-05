@@ -375,6 +375,19 @@ export default function App() {
       try {
         const data = JSON.parse(event.target.result);
 
+        // Support new pokopia_data structure: { habitats: [ { name, hab, lvl }, ... ] }
+        if (data && Array.isArray(data.habitats)) {
+          const importedRules = data.habitats.map((h) => ({
+            pattern: (Array.isArray(h.hab) ? h.hab.slice(0, 9).concat(Array(9 - h.hab.length).fill(null)) : Array(9).fill(null)),
+            pokemon: h.name || null,
+            // preserve lvl as-is (string or number)
+            level: h.lvl ?? 0,
+          }));
+
+          setRules(importedRules);
+          return;
+        }
+
         let importedRules = Array.isArray(data.rules)
           ? data.rules
           : Array.isArray(data)
@@ -403,37 +416,28 @@ export default function App() {
     reader.readAsText(file);
   };
 
-  function handleDragEnd(event) {
-    const { active, over } = event;
-    if (!over) return;
-
-    const data = active.id.split("|");
-    const type = data[0];
-    const value = data[1];
-
-    const overData = over.id.split("|");
-    const ruleIndex = parseInt(overData[1]);
-    const slotIndex = parseInt(overData[2]);
-
-    const newRules = [...rules];
-
-    if (type === "block" && slotIndex < 9) {
-      newRules[ruleIndex].pattern[slotIndex] = value;
-    }
-
-    if (type === "pokemon" && slotIndex >= 9) {
-      newRules[ruleIndex].pokemons[slotIndex - 9] = value;
-    }
-
-    setRules(newRules);
-  }
-
+  // export rules in pokopia_data format (habitats)
   function exportJSON() {
-    const json = JSON.stringify({ rules }, null, 2);
+    const habitats = rules
+      .map((r) => {
+        if (!r.pokemon) return null; // export only entries that have a pokemon name
+        // produce hab array by removing nulls and limiting to 9
+        const hab = (r.pattern || []).slice(0, 9).filter((x) => x != null);
+        return { name: r.pokemon, hab, lvl: r.level ?? 0 };
+      })
+      .filter(Boolean);
+
+    const out = {
+      habitats,
+      mega_habitats: [],
+      capacities: [],
+    };
+
+    const json = JSON.stringify(out, null, 2);
     const blob = new Blob([json], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "habitats.json";
+    a.download = "pokopia_data.json";
     a.click();
   }
 
@@ -488,6 +492,35 @@ export default function App() {
     backgroundSize: "20px 20px",
     border: "1px solid #ddd",
   };
+
+  // handle drag from palettes into card slots
+  function handleDragEnd(event) {
+    const { active, over } = event || {};
+    if (!active || !over || !active.id || !over.id) return;
+
+    const [type, value] = active.id.split("|");
+    const overParts = over.id.split("|");
+    // expected over.id format: `slot|<ruleIndex>|<slotIndex>` or similar
+    const ruleIndex = parseInt(overParts[1]);
+    const slotIndex = parseInt(overParts[2]);
+
+    if (Number.isNaN(ruleIndex) || Number.isNaN(slotIndex)) return;
+
+    const newRules = [...rules];
+
+    if (type === "block" && slotIndex < 9) {
+      newRules[ruleIndex] = { ...newRules[ruleIndex], pattern: [...(newRules[ruleIndex].pattern || Array(9).fill(null))] };
+      newRules[ruleIndex].pattern[slotIndex] = value;
+    }
+
+    if (type === "pokemon" && slotIndex >= 9) {
+      // if there were multiple pokemon slots previously, keep backward compatibility
+      newRules[ruleIndex] = { ...newRules[ruleIndex], pokemons: [...(newRules[ruleIndex].pokemons || [])] };
+      newRules[ruleIndex].pokemons[slotIndex - 9] = value;
+    }
+
+    setRules(newRules);
+  }
 
   return (
     <DndContext onDragEnd={handleDragEnd}>
