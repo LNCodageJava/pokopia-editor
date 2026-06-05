@@ -316,6 +316,8 @@ function defaultY(index) {
 export default function App() {
   const createRule = () => ({ pattern: Array(9).fill(null), pokemon: null, level: 0 });
   const [rules, setRules] = useState(Array(100).fill(null).map(createRule));
+  // selected cards (array of indices)
+  const [selected, setSelected] = useState([]);
 
   const [blockFilter, setBlockFilter] = useState("");
   const [pokemonFilter, setPokemonFilter] = useState("");
@@ -341,12 +343,17 @@ export default function App() {
 
   // track z-order
   const zRef = useRef(1);
-  function bringToFront(index) {
+  function bringToFront(indexOrArray) {
     setPositions((prev) => {
       const next = { ...(prev || {}) };
-      next[index] = { ...(next[index] || {}), z: ++zRef.current };
+      const indices = Array.isArray(indexOrArray) ? indexOrArray : [indexOrArray];
+      indices.forEach((i) => {
+        next[i] = { ...(next[i] || {}), z: ++zRef.current };
+      });
       // persist
-      localStorage.setItem(LAYOUT_KEY, JSON.stringify({ version: 1, positions: next, updatedAt: Date.now() }));
+      try {
+        localStorage.setItem(LAYOUT_KEY, JSON.stringify({ version: 1, positions: next, updatedAt: Date.now() }));
+      } catch (err) {}
       return next;
     });
   }
@@ -580,7 +587,20 @@ export default function App() {
 
         <div style={{ flex: 1 }}>
           <h2>Canvas libre (déplacez les cartes)</h2>
-          <div style={{ width: "100%", height: "80vh", overflow: "auto", border: "1px solid #ccc" }}>
+          <div
+            style={{ width: "100%", height: "80vh", overflow: "auto", border: "1px solid #ccc" }}
+            onPointerDown={(e) => {
+              // if click is outside any card, clear selection
+              try {
+                const el = e.target;
+                if (!el || !el.closest || !el.closest('.ruleCard')) {
+                  setSelected([]);
+                }
+              } catch (err) {
+                setSelected([]);
+              }
+            }}
+          >
             <div style={canvasStyle}>
               {rules.map((rule, rIndex) => (
                 <RuleCard
@@ -592,6 +612,8 @@ export default function App() {
                   bringToFront={bringToFront}
                   rules={rules}
                   setRules={setRules}
+                  selected={selected}
+                  setSelected={setSelected}
                   pokemonSuggestions={filteredPokemons}
                   blockSuggestions={filteredBlocks}
                 />

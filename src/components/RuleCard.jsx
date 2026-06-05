@@ -12,13 +12,14 @@ function getImage(id) {
   }
 }
 
-export default function RuleCard({ index, rule, positions, setPositions, bringToFront, rules, setRules, pokemonSuggestions, blockSuggestions }) {
+export default function RuleCard({ index, rule, positions, setPositions, bringToFront, rules, setRules, pokemonSuggestions, blockSuggestions, selected = [], setSelected }) {
   const ref = useRef(null);
   const draggingRef = useRef({});
   const [editing, setEditing] = useState(false);
   const [activeType, setActiveType] = useState('block');
   const [activeSlot, setActiveSlot] = useState(0);
 
+  const isSelected = Array.isArray(selected) && selected.includes(index);
   const pos = positions?.[index] || { x: 20 + (index % 5) * 240, y: 20 + Math.floor(index / 5) * 160, z: 0 };
 
   useEffect(() => {
@@ -34,16 +35,39 @@ export default function RuleCard({ index, rule, positions, setPositions, bringTo
     const el = ref.current;
     if (!el) return;
 
-    bringToFront(index);
+    // selection logic: modifier (ctrl/meta/shift) toggles membership, otherwise select single
+    if (setSelected) {
+      if (e.ctrlKey || e.metaKey || e.shiftKey) {
+        setSelected((prev) => {
+          if (!Array.isArray(prev)) prev = [];
+          return prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index];
+        });
+      } else {
+        // if not already the only selected, replace selection
+        setSelected((prev) => (Array.isArray(prev) && prev.length === 1 && prev[0] === index ? prev : [index]));
+      }
+    }
 
+    // prepare indices to move: if this card is selected, move all selected, else move this one
+    const movingIndices = (Array.isArray(selected) && selected.includes(index)) ? selected.slice() : [index];
+
+    bringToFront(movingIndices);
     const startX = e.clientX;
     const startY = e.clientY;
+
+    // capture original positions for all moving indices
+    const orig = {};
+    movingIndices.forEach((i) => {
+      const p = positions?.[i] || { x: (20 + (i % 5) * 240), y: (20 + Math.floor(i / 5) * 160), z: 0 };
+      orig[i] = { x: p.x, y: p.y, z: p.z || 0 };
+    });
+
     draggingRef.current = {
       pointerId: e.pointerId,
       startX,
       startY,
-      origX: pos.x,
-      origY: pos.y,
+      orig,
+      indices: movingIndices,
       raf: null,
     };
 
@@ -55,12 +79,18 @@ export default function RuleCard({ index, rule, positions, setPositions, bringTo
       if (!d) return;
       const dx = ev.clientX - d.startX;
       const dy = ev.clientY - d.startY;
-      const newX = d.origX + dx;
-      const newY = d.origY + dy;
 
+      // use rAF to update smoothly positions of all moving indices
       if (d.raf) cancelAnimationFrame(d.raf);
       d.raf = requestAnimationFrame(() => {
-        setPositions((prev) => ({ ...prev, [index]: { x: newX, y: newY, z: prev?.[index]?.z || 0 } }));
+        setPositions((prev) => {
+          const next = { ...(prev || {}) };
+          d.indices.forEach((i) => {
+            const o = d.orig[i];
+            next[i] = { ...(next[i] || {}), x: o.x + dx, y: o.y + dy, z: next[i]?.z || o.z || 0 };
+          });
+          return next;
+        });
       });
     }
 
@@ -73,6 +103,7 @@ export default function RuleCard({ index, rule, positions, setPositions, bringTo
       } catch (err) {
         // ignore
       }
+      // persist final position
       setPositions((prev) => ({ ...prev }));
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
@@ -115,11 +146,11 @@ export default function RuleCard({ index, rule, positions, setPositions, bringTo
   return (
     <div
       ref={ref}
-      className="ruleCard ruleCard--absolute"
+      className={"ruleCard ruleCard--absolute" + (isSelected ? ' ruleCard--selected' : '')}
       onPointerDown={onPointerDown}
     >
-      <div className="ruleCard__header">
-        <div className="ruleCard__main">
+      <div className="ruleCard__body">
+        <div className="ruleCard__left">
           <div className="ruleCard__preview">
             {(rule.pattern || Array(9).fill(null)).map((b, i) => (
               <div key={i} className="ruleCard__cell">
@@ -127,25 +158,29 @@ export default function RuleCard({ index, rule, positions, setPositions, bringTo
               </div>
             ))}
           </div>
-
-          <div className="ruleCard__meta">
-                        <div className="ruleCard__pokemonThumb">
-                          {rule.pokemon ? (
-                            <img src={getImage(rule.pokemon)} alt={rule.pokemon} className="ruleCard__pokemonImg" style={{imageRendering: 'pixelated' }}/>
-                          ) : null}
-                        </div>
-            <div className="ruleCard__title">Règle #{index}</div>
-            <div className="ruleCard__info">
-
-              <div>
-                Pokémon : {rule.pokemon ? rule.pokemon : '—'} · Niveau : {rule.level ?? 0}
-              </div>
-            </div>
-          </div>
         </div>
 
-        <div>
-          <button className="ruleCard__editBtn" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); setEditing((s) => !s); }}> {editing ? 'Fermer' : 'Éditer'} </button>
+        <div className="ruleCard__right">
+          <div className="ruleCard__pokemonLargeWrap">
+            <div className="ruleCard__pokemonThumbLarge">
+              {rule.pokemon ? (
+                <img src={getImage(rule.pokemon)} alt={rule.pokemon} className="ruleCard__pokemonImgLarge" style={{imageRendering: 'pixelated' }}/>
+              ) : (
+                <div className="ruleCard__pokemonPlaceholder">Pokémon</div>
+              )}
+            </div>
+
+            <div className="ruleCard__metaBelow">
+              <div className="ruleCard__title">{rule.pokemon ? rule.pokemon : '—'}</div>
+              <div className="ruleCard__level">Lvl: {rule.level ?? 0}</div>
+            </div>
+          </div>
+
+          <div className="ruleCard__rightSpacer" />
+
+          <div className="ruleCard__editContainer">
+            <button className="ruleCard__editBtn" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); setEditing((s) => !s); }}> {editing ? 'Fermer' : 'Éditer'} </button>
+          </div>
         </div>
       </div>
 

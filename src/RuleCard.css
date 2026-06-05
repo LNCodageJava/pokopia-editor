@@ -1,5 +1,5 @@
 :root{
-  --card-width:360px;
+  --card-width:200px;
   --card-padding:10px;
 }
 
@@ -14,6 +14,8 @@
   border-radius:8px;
   box-shadow:0 1px 2px rgba(0,0,0,0.04);
 }
+
+.ruleCard--selected{border-color:#2b6cdf;box-shadow:0 4px 12px rgba(43,108,223,0.18);outline:2px solid rgba(43,108,223,0.12)}
 
 .ruleCard__header{
   display:flex;
@@ -75,6 +77,15 @@
 .ruleCard__levelInput{width:120px;padding:6px}
 .ruleCard__autocompleteRow{}
 
+.ruleCard__body{display:flex;gap:12px;align-items:flex-start}
+.ruleCard__left{flex:0 0 auto}
+.ruleCard__right{display:flex;flex-direction:column;flex:1;min-width:50px;align-items:stretch}
+.ruleCard__pokemonLargeWrap{display:flex;flex-direction:column;align-items:center}
+.ruleCard__metaBelow{margin-top:8px;text-align:center}
+.ruleCard__level{font-size:12px;color:#555}
+.ruleCard__rightSpacer{flex:1}
+.ruleCard__editContainer{display:flex;justify-content:center;padding-top:8px}
+
 /* small helpers */
 .img{width:28px;height:28px;object-fit:cover,image-rendering:'pixelated'}
 .item{display:flex;align-items:center;gap:8px;padding:6px;border:1px solid #eee;border-radius:6px;margin:6px 0;background:#fff}
@@ -83,4 +94,3 @@
 
 /* ensure the app layout still looks OK */
 .app{padding:12px}
-
