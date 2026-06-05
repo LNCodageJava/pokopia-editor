@@ -198,6 +198,8 @@ export default function App() {
     pattern: Array(9).fill(null),
     pokemon: null,
     level: 0,
+    ability: null,
+    capacityBlocks: Array(3).fill(null),
   });
   const [rules, setRules] = useState(Array(100).fill(null).map(createRule));
   // selected cards (array of indices)
@@ -324,16 +326,26 @@ export default function App() {
       try {
         const data = JSON.parse(event.target.result);
 
-        // Support new pokopia_data structure: { habitats: [ { name, hab, lvl }, ... ] }
+        // Support new pokopia_data structure: { habitats: [ { name, hab, lvl }, ... ], capacities: [...] }
         if (data && Array.isArray(data.habitats)) {
-          const importedRules = data.habitats.map((h) => ({
-            pattern: Array.isArray(h.hab)
-              ? h.hab.slice(0, 9).concat(Array(9 - h.hab.length).fill(null))
-              : Array(9).fill(null),
-            pokemon: h.name || null,
-            // preserve lvl as-is (string or number)
-            level: h.lvl ?? 0,
-          }));
+          const importedRules = data.habitats.map((h) => {
+            // Find corresponding capacity for this pokemon
+            const capacity = Array.isArray(data.capacities)
+              ? data.capacities.find(c => c.name === h.name)
+              : null;
+
+            return {
+              pattern: Array.isArray(h.hab)
+                ? h.hab.slice(0, 9).concat(Array(9 - h.hab.length).fill(null))
+                : Array(9).fill(null),
+              pokemon: h.name || null,
+              level: h.lvl ?? 0,
+              ability: capacity?.ability || null,
+              capacityBlocks: Array.isArray(capacity?.blocks)
+                ? capacity.blocks.slice(0, 3).concat(Array(3 - capacity.blocks.length).fill(null))
+                : Array(3).fill(null),
+            };
+          });
 
           setRules(importedRules);
           return;
@@ -370,7 +382,7 @@ export default function App() {
     reader.readAsText(file);
   };
 
-  // export rules in pokopia_data format (habitats)
+  // export rules in pokopia_data format (habitats + capacities)
   function exportJSON() {
     const habitats = rules
       .map((r) => {
@@ -381,10 +393,23 @@ export default function App() {
       })
       .filter(Boolean);
 
+    const capacities = rules
+      .map((r) => {
+        if (!r.pokemon) return null;
+        if (!r.ability && (!r.capacityBlocks || r.capacityBlocks.every(b => !b))) return null;
+        const blocks = (r.capacityBlocks || []).slice(0, 3).filter((x) => x != null);
+        return {
+          name: r.pokemon,
+          ability: r.ability || "none",
+          blocks
+        };
+      })
+      .filter(Boolean);
+
     const out = {
       habitats,
       mega_habitats: [],
-      capacities: [],
+      capacities,
     };
 
     const json = JSON.stringify(out, null, 2);

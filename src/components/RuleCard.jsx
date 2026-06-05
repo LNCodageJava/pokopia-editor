@@ -205,6 +205,25 @@ export default function RuleCard({
               </div>
             ))}
           </div>
+
+          {/* Capacity section */}
+          <div style={{ marginTop: 8, fontSize: 11, fontWeight: 'bold', textAlign: 'center', color: '#555' }}>
+            {rule.ability || '—'}
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2, marginTop: 4 }}>
+            {(rule.capacityBlocks || Array(3).fill(null)).map((b, i) => (
+              <div key={i} style={{ width: 24, height: 24, border: '1px solid #ddd', borderRadius: 2, overflow: 'hidden' }}>
+                {b && (
+                  <ImageWithFallback
+                    src={getImage(b)}
+                    labelId={b}
+                    alt={b}
+                    style={{ width: '100%', height: '100%', imageRendering: "pixelated" }}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="ruleCard__right">
