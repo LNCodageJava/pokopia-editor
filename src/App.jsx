@@ -463,13 +463,12 @@ export default function App() {
 
   // canvas size - large area to simulate 'infinite' space
   const canvasStyle = {
-    width: 4000,
-    height: 3000,
+    width: 8000,
+    height: 6000,
     position: "relative",
     background:
       "linear-gradient(90deg, #f8f9fa 0.5px, transparent 0.5px), linear-gradient(#f8f9fa 0.5px, transparent 0.5px)",
     backgroundSize: "20px 20px",
-    border: "1px solid #ddd",
   };
 
   // pointer handlers for drawing shapes on the canvas
@@ -607,6 +606,7 @@ export default function App() {
         gap: 10,
         alignItems: 'center',
         zIndex: 10000,
+        flexWrap: 'wrap',
       }}>
         <span style={{ fontWeight: 'bold', marginRight: 10 }}>Outils:</span>
         <button
@@ -640,89 +640,50 @@ export default function App() {
         >
           Clear shapes
         </button>
+
+        <div style={{ borderLeft: '2px solid #ccc', height: 30, marginLeft: 10, marginRight: 10 }}></div>
+
+        <button onClick={exportJSON}>Export JSON</button>
+        <button onClick={exportLayout}>Export Layout</button>
+
+        <label style={{ cursor: "pointer" }}>
+          <button>Import JSON</button>
+          <input
+            type="file"
+            accept=".json"
+            onChange={importJSON}
+            style={{ display: "none" }}
+          />
+        </label>
+
+        <label style={{ cursor: "pointer" }}>
+          <button>Import Layout</button>
+          <input
+            type="file"
+            accept=".json"
+            onChange={importLayout}
+            style={{ display: "none" }}
+          />
+        </label>
+
+        <button onClick={resetLayout}>Reset Layout</button>
       </div>
 
-      <div className="app" style={{ display: "flex", gap: 20, marginTop: 60 }} onClick={handleGlobalClick}>
-        <div style={{ width: 320 }}>
-
-          <h2>Palette Blocs</h2>
-          <input
-            type="text"
-            placeholder="Filtrer blocs..."
-            value={blockFilter}
-            onChange={(e) => setBlockFilter(e.target.value)}
-            style={{ marginBottom: 5, width: "100%" }}
-          />
-          <div className="palette" style={{ maxHeight: 300, overflow: "auto" }}>
-            {filteredBlocks.map((b) => (
-              <Draggable key={b} id={`block|${b}`} label={b} />
-            ))}
-          </div>
-
-          <h2>Palette Pokémon</h2>
-          <input
-            type="text"
-            placeholder="Filtrer Pokémon..."
-            value={pokemonFilter}
-            onChange={(e) => setPokemonFilter(e.target.value)}
-            style={{ marginBottom: 5, width: "100%" }}
-          />
-          <div className="palette" style={{ maxHeight: 300, overflow: "auto" }}>
-            {filteredPokemons.map((p) => (
-              <Draggable key={p} id={`pokemon|${p}`} label={p} />
-            ))}
-          </div>
-
-          <div style={{ margin: "10px 0" }}>
-            <button onClick={exportJSON}>Exporter JSON (rules)</button>
-            <button style={{ marginLeft: 8 }} onClick={exportLayout}>
-              Exporter layout
-            </button>
-
-            {/* Import JSON */}
-            <label style={{ marginLeft: 10, cursor: "pointer", color: "blue" }}>
-              Importer JSON
-              <input
-                type="file"
-                accept=".json"
-                onChange={importJSON}
-                style={{ display: "none" }}
-              />
-            </label>
-
-            <label style={{ marginLeft: 10, cursor: "pointer", color: "blue" }}>
-              Importer layout
-              <input
-                type="file"
-                accept=".json"
-                onChange={importLayout}
-                style={{ display: "none" }}
-              />
-            </label>
-
-            <button style={{ marginLeft: 10 }} onClick={resetLayout}>
-              Reset layout
-            </button>
-          </div>
-        </div>
-
-        <div style={{ flex: 1 }}>
-          <h2>Canvas libre (déplacez les cartes)</h2>
-          <div
-            ref={canvasRef}
-            style={{
-              width: "100%",
-              height: "80vh",
-              overflow: "auto",
-              border: "1px solid #ccc",
-              cursor:
-                tool === "select"
-                  ? "default"
-                  : tool === "text"
-                    ? "text"
-                    : "crosshair",
-            }}
-            onPointerDown={(e) => {
+      <div className="app" style={{ display: "flex", gap: 0, marginTop: 60, height: 'calc(100vh - 60px)' }} onClick={handleGlobalClick}>
+        <div
+          ref={canvasRef}
+          style={{
+            width: "100%",
+            height: "100%",
+            overflow: "auto",
+            cursor:
+              tool === "select"
+                ? "default"
+                : tool === "text"
+                  ? "text"
+                  : "crosshair",
+          }}
+          onPointerDown={(e) => {
               // left click: clear selection if outside card and possibly start drawing
               if (e.button === 0) {
                 try {
@@ -932,7 +893,6 @@ export default function App() {
             </div>
           </div>
         </div>
-      </div>
     </DndContext>
   );
 }

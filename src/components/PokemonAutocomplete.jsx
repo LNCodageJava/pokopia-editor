@@ -1,11 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
+import ImageWithFallback from './ImageWithFallback';
 
-// Petit composant Autocomplete pour Pokémon
+// Petit composant Autocomplete pour Pokémon et Blocs
 // Props:
 // - value: valeur initiale (string)
 // - suggestions: array of strings
 // - onSelect(pokemon: string): appelé quand on choisit un élément
 // - placeholder
+
+// Fonction pour récupérer l'image depuis le nom
+function getImage(id) {
+  if (!id) return null;
+  if (id.includes(":")) {
+    // Format namespace:nom_block -> namespace__nom_block.png
+    const imageName = id.replace(":", "__");
+    return `/blocks/${imageName}.png`;
+  } else {
+    return `/pokemon/${id}.png`;
+  }
+}
 
 export default function PokemonAutocomplete({ value = '', suggestions = [], onSelect, placeholder = 'Tapez un Pokémon' }) {
   const [input, setInput] = useState(value || '');
@@ -94,9 +107,23 @@ export default function PokemonAutocomplete({ value = '', suggestions = [], onSe
                 padding: '6px 8px',
                 background: i === highlight ? '#f0f4ff' : 'transparent',
                 cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
               }}
             >
-              {s}
+              <ImageWithFallback
+                src={getImage(s)}
+                labelId={s}
+                alt={s}
+                style={{
+                  width: 24,
+                  height: 24,
+                  imageRendering: 'pixelated',
+                  flexShrink: 0,
+                }}
+              />
+              <span style={{ fontSize: 14 }}>{s}</span>
             </div>
           ))}
         </div>
