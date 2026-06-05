@@ -1,0 +1,86 @@
+:root{
+  --card-width:360px;
+  --card-padding:10px;
+}
+
+.ruleCard--absolute{
+  position:absolute;
+  touch-action:none;
+  width:var(--card-width);
+  padding:var(--card-padding);
+  box-sizing:border-box;
+  background:#fff;
+  border:1px solid #e6e6e6;
+  border-radius:8px;
+  box-shadow:0 1px 2px rgba(0,0,0,0.04);
+}
+
+.ruleCard__header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.ruleCard__main{
+  display:flex;
+  align-items:center;
+}
+
+.ruleCard__preview{
+  display:grid;
+  grid-template-columns:repeat(3,28px);
+  gap:4px;
+  margin-right:8px;
+}
+
+.ruleCard__cell{
+  width:28px;
+  height:28px;
+  background:#fff;
+  border:1px solid #eee;
+  border-radius:4px;
+  overflow:hidden;
+}
+.ruleCard__cellImg{width:100%;height:100%;object-fit:cover; image-rendering: 'pixelated';}
+
+.ruleCard__meta{}
+.ruleCard__title{font-weight:600}
+.ruleCard__info{font-size:12px;color:#444;display:flex;align-items:center;gap:8px}
+.ruleCard__pokemonThumb{width:28px;height:28px}
+.ruleCard__pokemonImg{width:80px;height:80px;border-radius:4px;object-fit:cover,image-rendering:'pixelated'}
+
+.ruleCard__editBtn{}
+
+.ruleCard__editor{margin-top:8px}
+.ruleCard__editorInner{display:flex;gap:12px}
+
+.ruleCard__blocksCol{}
+.ruleCard__blocksGrid{display:grid;grid-template-columns:repeat(3,48px);gap:6px}
+.ruleCard__blockCell{display:flex;flex-direction:column;align-items:center}
+.ruleCard__blockBtn{width:48px;height:48px;padding:2px;border:1px solid #ccc;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center}
+.ruleCard__blockBtn--active{border:2px solid #2b6cdf}
+.ruleCard__blockImg{width:100%;height:100%;object-fit:cover,image-rendering:'pixelated'}
+.ruleCard__blockPlaceholder{font-size:10px;color:#666}
+.ruleCard__removeBtn{margin-top:4px;font-size:11px}
+
+.ruleCard__rightCol{display:flex;flex-direction:column;gap:8px}
+.ruleCard__pokemonRow{display:flex;align-items:center;gap:8px}
+.ruleCard__pokemonThumbLarge{width:64px;height:64px;border:1px solid #eee;border-radius:6px;overflow:hidden}
+.ruleCard__pokemonImgLarge{width:100%;height:100%;object-fit:cover,image-rendering:'pixelated'}
+.ruleCard__pokemonPlaceholder{padding:8px;color:#666}
+.ruleCard__labelSmall{font-size:12px}
+.ruleCard__pokemonActions{display:flex;gap:6px;align-items:center}
+.ruleCard__chooseBtn{}
+.ruleCard__levelRow{}
+.ruleCard__levelInput{width:120px;padding:6px}
+.ruleCard__autocompleteRow{}
+
+/* small helpers */
+.img{width:28px;height:28px;object-fit:cover,image-rendering:'pixelated'}
+.item{display:flex;align-items:center;gap:8px;padding:6px;border:1px solid #eee;border-radius:6px;margin:6px 0;background:#fff}
+.label{font-size:12px}
+.palette{padding:6px}
+
+/* ensure the app layout still looks OK */
+.app{padding:12px}
+

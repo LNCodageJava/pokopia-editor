@@ -1,0 +1,739 @@
+{
+  "habitats": [
+    {
+      "name": "krookodile",
+      "hab": [
+        "minecraft:cactus",
+        "minecraft:water_bucket",
+        "minecraft:water_bucket",
+        "minecraft:water_bucket",
+        "minecraft:water_bucket"
+      ],
+      "lvl": 10
+    },
+    {
+      "name": "hippopotas",
+      "hab": [
+        "cobblemonfury:block_sable_rocheux",
+        "minecraft:cut_sandstone_slab",
+        "minecraft:cut_sandstone_slab",
+        "minecraft:cut_sandstone_slab",
+        "minecraft:cut_sandstone_slab",
+        "minecraft:cut_sandstone_slab",
+        "minecraft:cut_sandstone_slab",
+        "minecraft:cut_sandstone_slab",
+        "minecraft:cut_sandstone_slab"
+      ],
+      "lvl": 20
+    },
+    {
+      "name": "camerupt",
+      "hab": [
+        "cobblemonfury:silice",
+        "minecraft:chiseled_sandstone",
+        "minecraft:chiseled_sandstone",
+        "minecraft:chiseled_sandstone",
+        "minecraft:chiseled_sandstone"
+      ],
+      "lvl": 10
+    },
+    {
+      "name": "trapinch",
+      "hab": [
+        "cobblemonfury:silice_melted",
+        "cobblemonfury:silice_melted",
+        "cobblemonfury:silice_melted",
+        "cobblemonfury:silice_melted",
+        "cobblemonfury:silice_melted",
+        "cobblemonfury:silice_melted",
+        "cobblemonfury:silice_melted",
+        "cobblemonfury:silice_melted",
+        "cobblemonfury:silice_melted"
+      ],
+      "lvl": 30
+    },
+    {
+      "name": "leafeon",
+      "hab": [
+        "cobblemon:leaf_stone"
+      ],
+      "lvl": 40
+    },
+    {
+      "name": "espeon",
+      "hab": [
+        "cobblemon:sun_stone"
+      ],
+      "lvl": 40
+    },
+    {
+      "name": "chimchar",
+      "hab": [
+        "minecraft:torch",
+        "minecraft:torch",
+        "minecraft:torch",
+        "minecraft:torch"
+      ],
+      "lvl": 10
+    },
+    {
+      "name": "torkoal",
+      "hab": [
+        "minecraft:campfire",
+        "minecraft:campfire",
+        "minecraft:campfire"
+      ],
+      "lvl": 20
+    },
+    {
+      "name": "emboar",
+      "hab": [
+        "cobblemonfury:block_coeur_lave",
+        "cobblemonfury:block_charbon_inc",
+        "cobblemonfury:block_charbon_inc",
+        "cobblemonfury:block_charbon_inc",
+        "cobblemonfury:block_charbon_inc",
+        "cobblemonfury:block_charbon_inc",
+        "cobblemonfury:block_charbon_inc",
+        "cobblemonfury:block_charbon_inc",
+        "cobblemonfury:block_charbon_inc"
+      ],
+      "lvl": 30
+    },
+    {
+      "name": "heatmor",
+      "hab": [
+        "minecraft:glowstone",
+        "minecraft:lava_bucket",
+        "minecraft:lava_bucket",
+        "minecraft:lava_bucket",
+        "minecraft:lava_bucket",
+        "minecraft:lava_bucket",
+        "minecraft:lava_bucket",
+        "minecraft:lava_bucket",
+        "minecraft:lava_bucket"
+      ],
+      "lvl": 20
+    },
+    {
+      "name": "magmar",
+      "hab": [
+        "minecraft:magma_block",
+        "minecraft:lava_bucket",
+        "minecraft:lava_bucket",
+        "minecraft:lava_bucket",
+        "minecraft:lava_bucket"
+      ],
+      "lvl": 20
+    },
+    {
+      "name": "garganacl",
+      "hab": [
+        "minecraft:deepslate_diamond_ore"
+      ],
+      "lvl": 20
+    },
+    {
+      "name": "graveler",
+      "hab": [
+        "cobblemonfury:block_special_ore",
+        "minecraft:iron_ore",
+        "minecraft:iron_ore"
+      ],
+      "lvl": 20
+    },
+    {
+      "name": "machop",
+      "hab": [
+        "minecraft:anvil"
+      ],
+      "lvl": 20
+    },
+    {
+      "name": "ditto",
+      "hab": [
+        "minecraft:lapis_ore",
+        "minecraft:redstone_ore"
+      ],
+      "lvl": 20
+    },
+    {
+      "name": "magnemite",
+      "hab": [
+        "minecraft:gold_block",
+        "minecraft:copper_block",
+        "minecraft:copper_block",
+        "minecraft:copper_block",
+        "minecraft:copper_block",
+        "minecraft:copper_block",
+        "minecraft:copper_block",
+        "minecraft:copper_block",
+        "minecraft:copper_block"
+      ],
+      "lvl": 20
+    },
+    {
+      "name": "dugtrio",
+      "hab": [
+        "minecraft:powered_rail"
+      ],
+      "lvl": 30
+    },
+    {
+      "name": "excadrill",
+      "hab": [
+        "cobblemonfury:crystal_poison",
+        "cobblemonfury:crystal_fire",
+        "cobblemonfury:crystal_sand",
+        "minecraft:chiseled_stone_bricks",
+        "minecraft:chiseled_stone_bricks",
+        "minecraft:chiseled_stone_bricks"
+      ],
+      "lvl": 40
+    },
+    {
+      "name": "rhyhorn",
+      "hab": [
+        "minecraft:gilded_blackstone",
+        "minecraft:blackstone_stairs",
+        "minecraft:blackstone_stairs",
+        "minecraft:blackstone_stairs",
+        "minecraft:blackstone_stairs"
+      ],
+      "lvl": 20
+    },
+    {
+      "name": "mareep",
+      "hab": [
+        "cobblemon:pinap_berry",
+        "cobblemon:wepear_berry"
+      ],
+      "lvl": 10
+    },
+    {
+      "name": "miltank",
+      "hab": [
+        "minecraft:hay_block",
+        "minecraft:hay_block",
+        "minecraft:hay_block",
+        "minecraft:hay_block",
+        "minecraft:hay_block",
+        "minecraft:hay_block"
+      ],
+      "lvl": 20
+    },
+    {
+      "name": "tauros",
+      "hab": [
+        "cobblemonfury:apricorn_pack"
+      ],
+      "lvl": 30
+    },
+    {
+      "name": "altaria",
+      "hab": [
+        "cobblemonfury:crystal_poison",
+        "cobblemonfury:crystal_fire",
+        "cobblemonfury:crystal_sand",
+        "minecraft:chiseled_stone_bricks",
+        "minecraft:chiseled_stone_bricks",
+        "minecraft:chiseled_stone_bricks",
+        "minecraft:diamond"
+      ],
+      "lvl": 40
+    },
+    {
+      "name": "muk",
+      "hab": [
+        "minecraft:lily_pad",
+        "minecraft:mangrove_roots"
+      ],
+      "lvl": 10
+    },
+    {
+      "name": "skorupi",
+      "hab": [
+        "minecraft:dead_bush",
+        "minecraft:dead_bush",
+        "minecraft:dead_bush",
+        "minecraft:dead_bush",
+        "minecraft:dead_bush"
+      ],
+      "lvl": 20
+    },
+    {
+      "name": "bellsprout",
+      "hab": [
+        "minecraft:poppy",
+        "minecraft:poppy",
+        "minecraft:dandelion",
+        "minecraft:dandelion"
+      ],
+      "lvl": "EV21"
+    },
+    {
+      "name": "weezing",
+      "hab": [
+        "cobblemonfury:tapis_poison",
+        "cobblemonfury:tapis_poison",
+        "cobblemonfury:tapis_poison",
+        "cobblemonfury:tapis_poison",
+        "cobblemonfury:tapis_poison",
+        "cobblemonfury:tapis_poison",
+        "cobblemonfury:tapis_poison",
+        "cobblemonfury:tapis_poison",
+        "cobblemonfury:tapis_poison"
+      ],
+      "lvl": 20
+    },
+    {
+      "name": "toxicroak",
+      "hab": [
+        "cobblemonfury:cobblestone_poisoned",
+        "cobblemonfury:tapis_poison",
+        "cobblemonfury:tapis_poison",
+        "cobblemonfury:tapis_poison",
+        "cobblemonfury:tapis_poison",
+        "cobblemonfury:plant_poison",
+        "cobblemonfury:plant_poison",
+        "cobblemonfury:plant_poison",
+        "cobblemonfury:plant_poison"
+      ],
+      "lvl": 30
+    },
+    {
+      "name": "turtwig",
+      "hab": [
+        "minecraft:wheat_seeds",
+        "minecraft:wheat_seeds",
+        "minecraft:wheat_seeds",
+        "minecraft:wheat_seeds",
+        "minecraft:wheat_seeds",
+        "minecraft:wheat_seeds",
+        "minecraft:wheat_seeds",
+        "minecraft:wheat_seeds",
+        "minecraft:wheat_seeds"
+      ],
+      "lvl": 10
+    },
+    {
+      "name": "fraxure",
+      "hab": [
+        "minecraft:pumpkin",
+        "minecraft:melon"
+      ],
+      "lvl": 20
+    },
+    {
+      "name": "vileplume",
+      "hab": [
+        "cobblemon:oran_berry",
+        "cobblemon:cherry_berry",
+        "cobblemon:chesto_berry"
+      ],
+      "lvl": 10
+    }
+  ],
+  "mega_habitats": [
+    {
+      "name": "forge",
+      "blockList": [
+        "cobblemonfury:forge_bottom",
+        "cobblemonfury:forge_top",
+        "cobblemonfury:forge_side",
+        "minecraft:lava_bucket",
+        "minecraft:lava_bucket",
+        "minecraft:lava_bucket",
+        "minecraft:lava_bucket",
+        "minecraft:lava_bucket",
+        "minecraft:lava_bucket",
+        "minecraft:lava_bucket",
+        "minecraft:lava_bucket",
+        "minecraft:magma_block",
+        "minecraft:magma_block",
+        "minecraft:magma_block",
+        "minecraft:magma_block",
+        "minecraft:campfire",
+        "minecraft:campfire",
+        "minecraft:campfire",
+        "minecraft:campfire",
+        "minecraft:torch",
+        "minecraft:torch",
+        "minecraft:torch",
+        "minecraft:torch",
+        "minecraft:torch",
+        "minecraft:torch",
+        "minecraft:torch",
+        "minecraft:torch",
+        "minecraft:torch"
+      ],
+      "recipe": [
+        "minecraft:emerald_block",
+        "minecraft:magma_block",
+        "minecraft:magma_block",
+        "minecraft:magma_block",
+        "cobblemonfury:crystal_fire"
+      ]
+    },
+    {
+      "name": "desert",
+      "blockList": [
+        "cobblemonfury:silice_melted",
+        "cobblemonfury:silice_melted",
+        "cobblemonfury:silice_melted",
+        "cobblemonfury:silice_melted",
+        "cobblemonfury:silice_melted",
+        "cobblemonfury:silice_melted",
+        "cobblemonfury:silice_melted",
+        "cobblemonfury:silice_melted",
+        "cobblemonfury:silice_melted",
+        "cobblemonfury:silice_melted",
+        "cobblemonfury:silice_melted",
+        "cobblemonfury:silice_melted",
+        "minecraft:chiseled_sandstone",
+        "minecraft:chiseled_sandstone",
+        "minecraft:chiseled_sandstone",
+        "minecraft:chiseled_sandstone",
+        "minecraft:chiseled_sandstone",
+        "minecraft:chiseled_sandstone",
+        "minecraft:chiseled_sandstone",
+        "minecraft:chiseled_sandstone",
+        "minecraft:chiseled_sandstone",
+        "minecraft:chiseled_sandstone",
+        "minecraft:chiseled_sandstone",
+        "minecraft:chiseled_sandstone",
+        "minecraft:torch",
+        "minecraft:torch",
+        "minecraft:torch",
+        "minecraft:torch"
+      ],
+      "recipe": [
+        "minecraft:emerald_block",
+        "minecraft:sand",
+        "minecraft:sand",
+        "minecraft:sand",
+        "cobblemonfury:crystal_sand"
+      ]
+    },
+    {
+      "name": "poison",
+      "blockList": [
+        "cobblemonfury:cobblestone_poisoned",
+        "cobblemonfury:cobblestone_poisoned",
+        "cobblemonfury:cobblestone_poisoned",
+        "cobblemonfury:cobblestone_poisoned",
+        "cobblemonfury:cobblestone_poisoned",
+        "cobblemonfury:cobblestone_poisoned",
+        "cobblemonfury:cobblestone_poisoned",
+        "cobblemonfury:cobblestone_poisoned",
+        "cobblemonfury:cobblestone_poisoned",
+        "cobblemonfury:cobblestone_poisoned",
+        "cobblemonfury:cobblestone_poisoned",
+        "cobblemonfury:cobblestone_poisoned",
+        "cobblemonfury:cobblestone_poisoned",
+        "cobblemonfury:cobblestone_poisoned",
+        "cobblemonfury:cobblestone_poisoned",
+        "cobblemonfury:cobblestone_poisoned",
+        "cobblemonfury:tapis_poison",
+        "cobblemonfury:tapis_poison",
+        "cobblemonfury:tapis_poison",
+        "cobblemonfury:tapis_poison",
+        "cobblemonfury:tapis_poison",
+        "cobblemonfury:tapis_poison",
+        "cobblemonfury:plant_poison",
+        "cobblemonfury:plant_poison",
+        "cobblemonfury:plant_poison",
+        "cobblemonfury:plant_poison",
+        "cobblemonfury:plant_poison"
+      ],
+      "recipe": [
+        "minecraft:emerald_block",
+        "cobblemonfury:cobblestone_poisoned",
+        "cobblemonfury:cobblestone_poisoned",
+        "cobblemonfury:cobblestone_poisoned",
+        "cobblemonfury:crystal_poison"
+      ]
+    },
+    {
+      "name": "labo",
+      "blockList": [
+        "cobblemonfury:labo_1",
+        "cobblemonfury:labo_2",
+        "cobblemonfury:mini_xp",
+        "minecraft:copper_block",
+        "minecraft:copper_block",
+        "minecraft:copper_block",
+        "minecraft:copper_block",
+        "minecraft:copper_block",
+        "minecraft:copper_block",
+        "minecraft:copper_block",
+        "minecraft:copper_block",
+        "minecraft:copper_block",
+        "minecraft:repeater",
+        "minecraft:repeater",
+        "minecraft:repeater",
+        "minecraft:repeater"
+      ],
+      "recipe": [
+        "minecraft:emerald",
+        "minecraft:redstone",
+        "minecraft:redstone",
+        "minecraft:redstone",
+        "cobblemon:exp_candy_s"
+      ]
+    },
+    {
+      "name": "rhyhorn",
+      "blockList": [
+        "minecraft:gilded_blackstone",
+        "minecraft:blackstone_stairs",
+        "minecraft:blackstone_stairs",
+        "minecraft:blackstone_stairs",
+        "minecraft:blackstone_stairs",
+        "minecraft:gold_block",
+        "minecraft:gold_block",
+        "minecraft:gold_block",
+        "minecraft:gold_block"
+      ],
+      "recipe": [
+        "minecraft:iron_pickaxe",
+        "minecraft:paper",
+        "minecraft:paper",
+        "minecraft:paper",
+        "minecraft:enchanted_book"
+      ]
+    }
+  ],
+  "capacities": [
+    {
+      "name": "krookodile",
+      "ability": "transform",
+      "blocks": [
+        "minecraft:cobblestone",
+        "cobblemonfury:block_sable_rocheux"
+      ]
+    },
+    {
+      "name": "hippopotas",
+      "ability": "destroy",
+      "blocks": [
+        "minecraft:sand"
+      ]
+    },
+    {
+      "name": "camerupt",
+      "ability": "transform",
+      "blocks": [
+        "cobblemonfury:silice",
+        "cobblemonfury:silice_melted"
+      ]
+    },
+    {
+      "name": "trapinch",
+      "ability": "convert",
+      "blocks": []
+    },
+    {
+      "name": "chimchar",
+      "ability": "transform",
+      "blocks": [
+        "minecraft:coal_ore",
+        "cobblemonfury:block_charbon_inc"
+      ]
+    },
+    {
+      "name": "torkoal",
+      "ability": "transform",
+      "blocks": [
+        "minecraft:cobblestone",
+        "cobblemonfury:block_coeur_lave"
+      ]
+    },
+    {
+      "name": "emboar",
+      "ability": "transform",
+      "blocks": [
+        "minecraft:cobblestone",
+        "minecraft:coal_ore"
+      ]
+    },
+    {
+      "name": "monferno",
+      "ability": "transform",
+      "blocks": [
+        "minecraft:copper_block",
+        "cobblemonfury:forge_bottom"
+      ]
+    },
+    {
+      "name": "heatmor",
+      "ability": "transform",
+      "blocks": [
+        "minecraft:iron_block",
+        "cobblemonfury:forge_side"
+      ]
+    },
+    {
+      "name": "magmortar",
+      "ability": "transform",
+      "blocks": [
+        "minecraft:gold_block",
+        "cobblemonfury:forge_top"
+      ]
+    },
+    {
+      "name": "garganacl",
+      "ability": "transform",
+      "blocks": [
+        "minecraft:iron_ore",
+        "cobblemonfury:block_special_ore"
+      ]
+    },
+    {
+      "name": "graveler",
+      "ability": "destroy",
+      "blocks": [
+        "minecraft:stone",
+        "minecraft:gravel"
+      ]
+    },
+    {
+      "name": "golem",
+      "ability": "destroy",
+      "blocks": [
+        "minecraft:deepslate",
+        "minecraft:blackstone"
+      ]
+    },
+    {
+      "name": "machop",
+      "ability": "transform",
+      "blocks": [
+        "minecraft:redstone_block",
+        "cobblemonfury:labo_1"
+      ]
+    },
+    {
+      "name": "ditto",
+      "ability": "transform",
+      "blocks": [
+        "minecraft:redstone_block",
+        "cobblemonfury:labo_2"
+      ]
+    },
+    {
+      "name": "magnemite",
+      "ability": "transform",
+      "blocks": [
+        "minecraft:emerald_block",
+        "cobblemonfury:mini_xp"
+      ]
+    },
+    {
+      "name": "dugtrio",
+      "ability": "destroy",
+      "blocks": [
+        "minecraft:dirt",
+        "minecraft:grass_block"
+      ]
+    },
+    {
+      "name": "excadrill",
+      "ability": "destroy",
+      "blocks": [
+        "minecraft:obsidian"
+      ]
+    },
+    {
+      "name": "rhyhorn",
+      "ability": "convert",
+      "blocks": [
+        "minecraft:silktouch"
+      ]
+    },
+    {
+      "name": "mareep",
+      "ability": "convert",
+      "blocks": [
+        "minecraft:wool"
+      ]
+    },
+    {
+      "name": "miltank",
+      "ability": "convert",
+      "blocks": [
+        "minecraft:milk_bucket"
+      ]
+    },
+    {
+      "name": "tauros",
+      "ability": "mount",
+      "blocks": []
+    },
+    {
+      "name": "altaria",
+      "ability": "mount",
+      "blocks": []
+    },
+    {
+      "name": "muk",
+      "ability": "transform",
+      "blocks": [
+        "minecraft:water_bucket",
+        "cobblemonfury:tapis_poison"
+      ]
+    },
+    {
+      "name": "skorupi",
+      "ability": "transform",
+      "blocks": [
+        "minecraft:cobblestone",
+        "cobblemonfury:cobblestone_poisoned"
+      ]
+    },
+    {
+      "name": "victreebel",
+      "ability": "transform",
+      "blocks": [
+        "minecraft:poppy",
+        "cobblemonfury:plant_poison"
+      ]
+    },
+    {
+      "name": "turtwig",
+      "ability": "destroy",
+      "blocks": [
+        "minecraft:carrot",
+        "minecraft:potato",
+        "minecraft:wheat"
+      ]
+    },
+    {
+      "name": "fraxure",
+      "ability": "destroy",
+      "blocks": [
+        "minecraft:oak_log",
+        "minecraft:birch_log",
+        "minecraft:cherry_log"
+      ]
+    },
+    {
+      "name": "vileplume",
+      "ability": "place",
+      "blocks": [
+        "minecraft:carrot",
+        "minecraft:potato",
+        "minecraft:wheat"
+      ]
+    },
+    {
+      "name": "grotle",
+      "ability": "place",
+      "blocks": [
+        "minecraft:oak_sapling",
+        "minecraft:birch_sapling",
+        "minecraft:cherry_sapling"
+      ]
+    }
+  ]
+}

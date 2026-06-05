@@ -2,6 +2,7 @@
   width: 40px;
   height: 40px;
   object-fit: contain;
+  image-rendering: 'pixelated'
 }
 
 .app {
@@ -60,6 +61,7 @@
   width: 40px;
   height: 40px;
   object-fit: none;
+  image-rendering: 'pixelated'
 }
 
 .overlay {
