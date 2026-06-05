@@ -646,36 +646,55 @@ export default function App() {
         <button onClick={exportJSON}>Export JSON</button>
         <button onClick={exportLayout}>Export Layout</button>
 
-        <label style={{ cursor: "pointer" }}>
-          <button>Import JSON</button>
-          <input
-            type="file"
-            accept=".json"
-            onChange={importJSON}
-            style={{ display: "none" }}
-          />
+        <label htmlFor="import-json-file" style={{
+          cursor: "pointer",
+          padding: '6px 12px',
+          backgroundColor: '#fff',
+          border: '1px solid #ccc',
+          borderRadius: '4px',
+          display: 'inline-block',
+          fontSize: '14px',
+        }}>
+          Import JSON
         </label>
+        <input
+          id="import-json-file"
+          type="file"
+          accept=".json"
+          onChange={importJSON}
+          style={{ display: "none" }}
+        />
 
-        <label style={{ cursor: "pointer" }}>
-          <button>Import Layout</button>
-          <input
-            type="file"
-            accept=".json"
-            onChange={importLayout}
-            style={{ display: "none" }}
-          />
+        <label htmlFor="import-layout-file" style={{
+          cursor: "pointer",
+          padding: '6px 12px',
+          backgroundColor: '#fff',
+          border: '1px solid #ccc',
+          borderRadius: '4px',
+          display: 'inline-block',
+          fontSize: '14px',
+        }}>
+          Import Layout
         </label>
+        <input
+          id="import-layout-file"
+          type="file"
+          accept=".json"
+          onChange={importLayout}
+          style={{ display: "none" }}
+        />
 
         <button onClick={resetLayout}>Reset Layout</button>
       </div>
 
-      <div className="app" style={{ display: "flex", gap: 0, marginTop: 60, height: 'calc(100vh - 60px)' }} onClick={handleGlobalClick}>
+      <div className="app" style={{ position: 'fixed', top: 60, left: 0, right: 0, bottom: 0, display: "flex", gap: 0, overflow: 'hidden' }} onClick={handleGlobalClick}>
         <div
           ref={canvasRef}
           style={{
             width: "100%",
             height: "100%",
             overflow: "auto",
+            position: "relative",
             cursor:
               tool === "select"
                 ? "default"
