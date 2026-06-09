@@ -262,7 +262,11 @@ export default function MegaHabitatCard({
           className="ruleCard__editor"
           onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}
-          style={{ maxWidth: 500 }}
+          style={{
+            maxWidth: 500,
+            left: Math.min(pos.x + 320, window.innerWidth - 520),
+            top: Math.min(pos.y, window.innerHeight - 100)
+          }}
         >
           <div className="ruleCard__editorInner">
             <div style={{ marginBottom: 12 }}>

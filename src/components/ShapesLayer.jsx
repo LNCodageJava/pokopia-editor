@@ -13,7 +13,7 @@ export default function ShapesLayer({ shapes = [], onShapeContext }) {
   return (
     <>
       {/* SVG Layer for rectangles and arrows (background) */}
-      <svg width={width} height={height} style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'none', zIndex: 1 }}>
+      <svg width={width} height={height} style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'none', zIndex: -1 }}>
         {backgroundShapes.map((s) => {
           if (s.type === 'rect') {
             const x = Math.min(s.x1, s.x2);
@@ -118,7 +118,7 @@ export default function ShapesLayer({ shapes = [], onShapeContext }) {
               cursor: 'pointer',
               userSelect: 'none',
               boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-              zIndex: 100,
+              zIndex: -2,
               pointerEvents: 'auto',
             }}
             onContextMenu={(e) => {

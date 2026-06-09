@@ -290,6 +290,10 @@ export default function RuleCard({
           className="ruleCard__editor"
           onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}
+          style={{
+            left: Math.min(pos.x + 220, window.innerWidth - 520),
+            top: Math.min(pos.y, window.innerHeight - 100)
+          }}
         >
           <div className="ruleCard__editorInner">
             <div className="ruleCard__blocksCol">
