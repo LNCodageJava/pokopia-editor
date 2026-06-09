@@ -264,25 +264,38 @@ export default function MegaHabitatCard({
           onClick={(e) => e.stopPropagation()}
           style={{
             maxWidth: 500,
-            left: Math.min(pos.x + 320, window.innerWidth - 520),
-            top: Math.min(pos.y, window.innerHeight - 100)
+            left: pos.x,
+            top: pos.y
           }}
         >
-          <div className="ruleCard__editorInner">
-            <div style={{ marginBottom: 12 }}>
-              <div className="ruleCard__labelSmall">Nom</div>
-              <input
-                type="text"
-                className="ruleCard__levelInput"
-                style={{ width: '100%' }}
-                value={megaHabitat.name || ""}
-                onChange={(e) => setName(e.target.value)}
-                onPointerDown={(e) => e.stopPropagation()}
+          {/* Autocomplete en haut */}
+          <div className="ruleCard__autocompleteRow" style={{ marginBottom: 16 }}>
+            <div className="ruleCard__labelSmall">Recherche</div>
+            {activeType === "pokemon" ? (
+              <PokemonAutocomplete
+                value={megaHabitat.pokemons?.[activeSlot] || ""}
+                suggestions={pokemonSuggestions}
+                onSelect={(p) => {
+                  setPokemonAt(activeSlot, p);
+                }}
+                placeholder={`Choisir Pokémon ${activeSlot + 1}`}
               />
-            </div>
+            ) : (
+              <PokemonAutocomplete
+                value={megaHabitat.blockList?.[activeSlot] || ""}
+                suggestions={blockSuggestions}
+                onSelect={(b) => {
+                  setBlockAt(activeSlot, b);
+                }}
+                placeholder={`Choisir bloc ${activeSlot + 1}`}
+              />
+            )}
+          </div>
 
-            <div style={{ marginBottom: 12 }}>
-              <div className="ruleCard__labelSmall">Grille 5x6 Blocs</div>
+          <div className="ruleCard__editorInner" style={{ display: 'flex', gap: 16 }}>
+            {/* Colonne gauche : Grille 5x6 Blocs */}
+            <div style={{ flex: '0 0 auto' }}>
+              <div className="ruleCard__labelSmall" style={{ marginBottom: 8 }}>Grille 5x6 Blocs</div>
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(5, 1fr)',
@@ -334,80 +347,72 @@ export default function MegaHabitatCard({
               </div>
             </div>
 
-            <div style={{ marginBottom: 12 }}>
-              <div className="ruleCard__labelSmall">6 Pokémons</div>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(6, 1fr)',
-                gap: 4
-              }}>
-                {(megaHabitat.pokemons || Array(6).fill(null)).map((p, i) => (
-                  <div key={i} style={{ position: 'relative' }}>
-                    <button
-                      className={
-                        "ruleCard__blockBtn" +
-                        (activeType === "pokemon" && activeSlot === i
-                          ? " ruleCard__blockBtn--active"
-                          : "")
-                      }
-                      style={{ width: 48, height: 48 }}
-                      onPointerDown={(e) => e.stopPropagation()}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveType("pokemon");
-                        setActiveSlot(i);
-                      }}
-                    >
-                      {p ? (
-                        <ImageWithFallback
-                          src={getImage(p)}
-                          labelId={p}
-                          alt={p}
-                          style={{ width: '100%', height: '100%', imageRendering: "pixelated" }}
-                        />
-                      ) : (
-                        <div style={{ fontSize: 10 }}>P{i + 1}</div>
-                      )}
-                    </button>
-                    {p && (
+            {/* Colonne droite : Nom + 6 Pokémons */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div>
+                <div className="ruleCard__labelSmall" style={{ marginBottom: 4 }}>Nom</div>
+                <input
+                  type="text"
+                  className="ruleCard__levelInput"
+                  style={{ width: '100%' }}
+                  value={megaHabitat.name || ""}
+                  onChange={(e) => setName(e.target.value)}
+                  onPointerDown={(e) => e.stopPropagation()}
+                />
+              </div>
+
+              <div>
+                <div className="ruleCard__labelSmall" style={{ marginBottom: 8 }}>6 Pokémons</div>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: 4
+                }}>
+                  {(megaHabitat.pokemons || Array(6).fill(null)).map((p, i) => (
+                    <div key={i} style={{ position: 'relative' }}>
                       <button
-                        className="ruleCard__removeBtn"
-                        style={{ fontSize: 10, padding: '2px 4px' }}
+                        className={
+                          "ruleCard__blockBtn" +
+                          (activeType === "pokemon" && activeSlot === i
+                            ? " ruleCard__blockBtn--active"
+                            : "")
+                        }
+                        style={{ width: 48, height: 48 }}
                         onPointerDown={(e) => e.stopPropagation()}
                         onClick={(e) => {
                           e.stopPropagation();
-                          removePokemon(i);
+                          setActiveType("pokemon");
+                          setActiveSlot(i);
                         }}
                       >
-                        X
+                        {p ? (
+                          <ImageWithFallback
+                            src={getImage(p)}
+                            labelId={p}
+                            alt={p}
+                            style={{ width: '100%', height: '100%', imageRendering: "pixelated" }}
+                          />
+                        ) : (
+                          <div style={{ fontSize: 10 }}>P{i + 1}</div>
+                        )}
                       </button>
-                    )}
-                  </div>
-                ))}
+                      {p && (
+                        <button
+                          className="ruleCard__removeBtn"
+                          style={{ fontSize: 10, padding: '2px 4px' }}
+                          onPointerDown={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removePokemon(i);
+                          }}
+                        >
+                          X
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-
-            <div className="ruleCard__autocompleteRow">
-              <div className="ruleCard__labelSmall">Recherche</div>
-              {activeType === "pokemon" ? (
-                <PokemonAutocomplete
-                  value={megaHabitat.pokemons?.[activeSlot] || ""}
-                  suggestions={pokemonSuggestions}
-                  onSelect={(p) => {
-                    setPokemonAt(activeSlot, p);
-                  }}
-                  placeholder={`Choisir Pokémon ${activeSlot + 1}`}
-                />
-              ) : (
-                <PokemonAutocomplete
-                  value={megaHabitat.blockList?.[activeSlot] || ""}
-                  suggestions={blockSuggestions}
-                  onSelect={(b) => {
-                    setBlockAt(activeSlot, b);
-                  }}
-                  placeholder={`Choisir bloc ${activeSlot + 1}`}
-                />
-              )}
             </div>
           </div>
         </div>
