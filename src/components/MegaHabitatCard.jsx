@@ -230,14 +230,17 @@ export default function MegaHabitatCard({
                 border: '2px solid #2b6cdf',
                 borderRadius: 4,
                 overflow: 'hidden',
-                backgroundColor: '#fff'
+                backgroundColor: '#fff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}>
                 {p && (
                   <ImageWithFallback
                     src={getImage(p)}
                     labelId={p}
                     alt={p}
-                    style={{ width: '100%', height: '100%', imageRendering: "pixelated" }}
+                    style={{ width: '200%', height: '200%', imageRendering: "pixelated" }}
                   />
                 )}
               </div>

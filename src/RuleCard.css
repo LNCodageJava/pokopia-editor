@@ -84,6 +84,7 @@
   margin-top: 8px;
   background: aliceblue;
   position: sticky;
+    width: 400px;
   margin-top: -250px;
   border: 2px solid #2b6cdf;
   border-radius: 8px;
@@ -98,7 +99,7 @@
   margin-top: 8px;
   background: aliceblue;
   position: sticky;
-  margin-top: -300px;
+  margin-top: -350px;
   width: 1000px;
   border: 2px solid #2b6cdf;
   border-radius: 8px;

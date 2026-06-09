@@ -245,14 +245,14 @@ export default function RuleCard({
 
         <div className="ruleCard__right">
           <div className="ruleCard__pokemonLargeWrap">
-            <div className="ruleCard__pokemonThumbLarge">
+            <div className="ruleCard__pokemonThumbLarge" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
               {rule.pokemon ? (
                 <ImageWithFallback
                   src={getImage(rule.pokemon)}
                   labelId={rule.pokemon}
                   alt={rule.pokemon}
                   className="ruleCard__pokemonImgLarge"
-                  style={{ imageRendering: "pixelated" }}
+                  style={{ imageRendering: "pixelated", width: '200%', height: '200%' }}
                 />
               ) : (
                 <div className="ruleCard__pokemonPlaceholder">Pokémon</div>
