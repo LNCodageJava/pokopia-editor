@@ -989,6 +989,7 @@ export default function App() {
                   }}
                   megaHabitats={megaHabitats}
                   setMegaHabitats={setMegaHabitats}
+                  pokemonSuggestions={filteredPokemons}
                   blockSuggestions={filteredBlocks}
                 />
               ))}

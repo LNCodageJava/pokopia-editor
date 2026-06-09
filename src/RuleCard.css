@@ -82,9 +82,24 @@
 
 .ruleCard__editor {
   margin-top: 8px;
-  background: aqua;
+  background: aliceblue;
+  position: sticky;
+  margin-top: -250px;
+  border: 2px solid #2b6cdf;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  max-height: 80vh;
+}
+
+
+
+.megaHabitatCard__editor {
+  margin-top: 8px;
+  background: aliceblue;
   position: sticky;
   margin-top: -300px;
+  width: 1000px;
   border: 2px solid #2b6cdf;
   border-radius: 8px;
   padding: 12px;

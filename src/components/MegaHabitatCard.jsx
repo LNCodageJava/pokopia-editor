@@ -145,14 +145,16 @@ export default function MegaHabitatCard({
 
   function setBlockAt(slotIndex, blockId) {
     const next = [...megaHabitats];
-    next[index] = { ...next[index], blockList: [...next[index].blockList] };
+    const currentBlockList = next[index].blockList || Array(30).fill(null);
+    next[index] = { ...next[index], blockList: [...currentBlockList] };
     next[index].blockList[slotIndex] = blockId;
     setMegaHabitats(next);
   }
 
   function setPokemonAt(pokemonSlot, pokemonId) {
     const next = [...megaHabitats];
-    next[index] = { ...next[index], pokemons: [...(next[index].pokemons || Array(6).fill(null))] };
+    const currentPokemons = next[index].pokemons || Array(6).fill(null);
+    next[index] = { ...next[index], pokemons: [...currentPokemons] };
     next[index].pokemons[pokemonSlot] = pokemonId;
     setMegaHabitats(next);
   }
@@ -259,7 +261,7 @@ export default function MegaHabitatCard({
 
       {editing && (
         <div
-          className="ruleCard__editor"
+          className="megaHabitatCard__editor"
           onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}
           style={{
@@ -268,34 +270,9 @@ export default function MegaHabitatCard({
             top: pos.y
           }}
         >
-          {/* Autocomplete en haut */}
-          <div className="ruleCard__autocompleteRow" style={{ marginBottom: 16 }}>
-            <div className="ruleCard__labelSmall">Recherche</div>
-            {activeType === "pokemon" ? (
-              <PokemonAutocomplete
-                value={megaHabitat.pokemons?.[activeSlot] || ""}
-                suggestions={pokemonSuggestions}
-                onSelect={(p) => {
-                  setPokemonAt(activeSlot, p);
-                }}
-                placeholder={`Choisir Pokémon ${activeSlot + 1}`}
-              />
-            ) : (
-              <PokemonAutocomplete
-                value={megaHabitat.blockList?.[activeSlot] || ""}
-                suggestions={blockSuggestions}
-                onSelect={(b) => {
-                  setBlockAt(activeSlot, b);
-                }}
-                placeholder={`Choisir bloc ${activeSlot + 1}`}
-              />
-            )}
-          </div>
-
           <div className="ruleCard__editorInner" style={{ display: 'flex', gap: 16 }}>
             {/* Colonne gauche : Grille 5x6 Blocs */}
             <div style={{ flex: '0 0 auto' }}>
-              <div className="ruleCard__labelSmall" style={{ marginBottom: 8 }}>Grille 5x6 Blocs</div>
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(5, 1fr)',
@@ -347,8 +324,28 @@ export default function MegaHabitatCard({
               </div>
             </div>
 
-            {/* Colonne droite : Nom + 6 Pokémons */}
+            {/* Colonne droite : Autocomplete + Nom + 6 Pokémons */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {/* Autocomplete */}
+              <div className="ruleCard__autocompleteRow">
+                <div className="ruleCard__labelSmall">Recherche</div>
+                {activeType === "pokemon" ? (
+                  <PokemonAutocomplete
+                    value={(megaHabitat.pokemons || Array(6).fill(null))[activeSlot] || ""}
+                    suggestions={pokemonSuggestions}
+                    onSelect={(p) => setPokemonAt(activeSlot, p)}
+                    placeholder={`Choisir Pokémon ${activeSlot + 1}`}
+                  />
+                ) : (
+                  <PokemonAutocomplete
+                    value={(megaHabitat.blockList || Array(30).fill(null))[activeSlot] || ""}
+                    suggestions={blockSuggestions}
+                    onSelect={(b) => setBlockAt(activeSlot, b)}
+                    placeholder={`Choisir bloc ${activeSlot + 1}`}
+                  />
+                )}
+              </div>
+
               <div>
                 <div className="ruleCard__labelSmall" style={{ marginBottom: 4 }}>Nom</div>
                 <input
@@ -412,6 +409,19 @@ export default function MegaHabitatCard({
                     </div>
                   ))}
                 </div>
+              </div>
+
+              <div style={{ textAlign: 'center', marginTop: 8 }}>
+                <button
+                  className="ruleCard__editBtn"
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setEditing(false);
+                  }}
+                >
+                  Fermer
+                </button>
               </div>
             </div>
           </div>

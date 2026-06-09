@@ -28,6 +28,10 @@ export default function PokemonAutocomplete({ value = '', suggestions = [], onSe
   const ref = useRef(null);
 
   useEffect(() => {
+    setInput(value || '');
+  }, [value]);
+
+  useEffect(() => {
     setFiltered(
       suggestions.filter((s) => s.toLowerCase().includes((input || '').toLowerCase())).slice(0, 10)
     );
