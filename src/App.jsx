@@ -2,10 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import { DndContext, useDraggable, useDroppable } from "@dnd-kit/core";
 import "./App.css";
 import RuleCard from "./components/RuleCard";
+import MegaHabitatCard from "./components/MegaHabitatCard";
 import ShapesLayer from "./components/ShapesLayer";
 import ImageWithFallback from "./components/ImageWithFallback";
 
 const LAYOUT_KEY = "pokopia.rules.layout.v1";
+const MEGA_LAYOUT_KEY = "pokopia.megahabitats.layout.v1";
+const RULES_DATA_KEY = "pokopia.rules.data.v1";
+const MEGA_DATA_KEY = "pokopia.megahabitats.data.v1";
 
 // Charger dynamiquement tous les blocs depuis le dossier public/blocks
 // Format des fichiers: namespace__nom_block.png -> namespace:nom_block
@@ -201,7 +205,35 @@ export default function App() {
     ability: null,
     capacityBlocks: Array(3).fill(null),
   });
-  const [rules, setRules] = useState(Array(100).fill(null).map(createRule));
+
+  const createMegaHabitat = () => ({
+    name: "",
+    blockList: Array(30).fill(null),
+    pokemons: Array(6).fill(null),
+  });
+
+  const [rules, setRules] = useState(() => {
+    try {
+      const raw = localStorage.getItem(RULES_DATA_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (err) {}
+    return Array(100).fill(null).map(createRule);
+  });
+
+  const [megaHabitats, setMegaHabitats] = useState(() => {
+    try {
+      const raw = localStorage.getItem(MEGA_DATA_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (err) {}
+    return [];
+  });
+
   // selected cards (array of indices)
   const [selected, setSelected] = useState([]);
   // shapes drawn on canvas (rect or arrow)
@@ -251,6 +283,18 @@ export default function App() {
     return obj;
   });
 
+  // positions for megahabitats: { [index]: { x, y, z } }
+  const [megaPositions, setMegaPositions] = useState(() => {
+    try {
+      const raw = localStorage.getItem(MEGA_LAYOUT_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.positions) return parsed.positions;
+      }
+    } catch (err) {}
+    return {};
+  });
+
   // track z-order
   const zRef = useRef(1);
   function bringToFront(indexOrArray) {
@@ -277,6 +321,30 @@ export default function App() {
     });
   }
 
+  // save rules data when they change
+  useEffect(() => {
+    const id = setTimeout(() => {
+      try {
+        localStorage.setItem(RULES_DATA_KEY, JSON.stringify(rules));
+      } catch (err) {
+        console.error("Erreur sauvegarde rules", err);
+      }
+    }, 250);
+    return () => clearTimeout(id);
+  }, [rules]);
+
+  // save megahabitats data when they change
+  useEffect(() => {
+    const id = setTimeout(() => {
+      try {
+        localStorage.setItem(MEGA_DATA_KEY, JSON.stringify(megaHabitats));
+      } catch (err) {
+        console.error("Erreur sauvegarde megahabitats", err);
+      }
+    }, 250);
+    return () => clearTimeout(id);
+  }, [megaHabitats]);
+
   // save positions when they change (debounced)
   useEffect(() => {
     const id = setTimeout(() => {
@@ -296,6 +364,25 @@ export default function App() {
     }, 250);
     return () => clearTimeout(id);
   }, [positions]);
+
+  // save megahabitats positions when they change
+  useEffect(() => {
+    const id = setTimeout(() => {
+      try {
+        localStorage.setItem(
+          MEGA_LAYOUT_KEY,
+          JSON.stringify({
+            version: 1,
+            positions: megaPositions,
+            updatedAt: Date.now(),
+          }),
+        );
+      } catch (err) {
+        console.error("Erreur sauvegarde mega layout", err);
+      }
+    }, 250);
+    return () => clearTimeout(id);
+  }, [megaPositions]);
 
   // persist shapes too when they change
   useEffect(() => {
@@ -380,7 +467,37 @@ export default function App() {
           // Combiner les deux listes
           const importedRules = [...rulesFromHabitats, ...rulesFromCapacitiesOnly];
 
+          // Import mega_habitats
+          const importedMegaHabitats = [];
+          if (Array.isArray(data.mega_habitats)) {
+            data.mega_habitats.forEach(m => {
+              // Create blockList, filling with null to reach 30 slots
+              const blockList = Array(30).fill(null);
+              const sourceBlocks = m.blockList || m.biomes; // support both blockList and biomes
+              if (Array.isArray(sourceBlocks)) {
+                sourceBlocks.forEach((b, i) => {
+                  if (i < 30) blockList[i] = b;
+                });
+              }
+
+              // Create pokemons array, filling with null to reach 6 slots
+              const pokemons = Array(6).fill(null);
+              if (Array.isArray(m.pokemons)) {
+                m.pokemons.forEach((p, i) => {
+                  if (i < 6) pokemons[i] = p;
+                });
+              }
+
+              importedMegaHabitats.push({
+                name: m.name || "",
+                blockList,
+                pokemons,
+              });
+            });
+          }
+
           setRules(importedRules);
+          setMegaHabitats(importedMegaHabitats);
           return;
         }
 
@@ -439,9 +556,18 @@ export default function App() {
       })
       .filter(Boolean);
 
+    const mega_habitats = megaHabitats
+      .map((m) => {
+        if (!m.name) return null; // export only entries with a name
+        const biomes = (m.blockList || []).slice(0, 30).filter((x) => x != null);
+        const pokemons = (m.pokemons || []).slice(0, 6).filter((x) => x != null);
+        return { name: m.name, biomes, pokemons };
+      })
+      .filter(Boolean);
+
     const out = {
       habitats,
-      mega_habitats: [],
+      mega_habitats,
       capacities,
     };
 
@@ -743,6 +869,34 @@ export default function App() {
         />
 
         <button onClick={resetLayout}>Reset Layout</button>
+
+        <div style={{ borderLeft: '2px solid #ccc', height: 30, marginLeft: 10, marginRight: 10 }}></div>
+
+        <button onClick={() => {
+          const newRule = createRule();
+          const newRules = [...rules, newRule];
+          const newIndex = rules.length;
+          setRules(newRules);
+          setPositions(prev => ({
+            ...prev,
+            [newIndex]: { x: defaultX(newIndex), y: defaultY(newIndex), z: ++zRef.current }
+          }));
+        }}>
+          New Rule
+        </button>
+
+        <button onClick={() => {
+          const newMega = createMegaHabitat();
+          const newMegaHabitats = [...megaHabitats, newMega];
+          const newIndex = megaHabitats.length;
+          setMegaHabitats(newMegaHabitats);
+          setMegaPositions(prev => ({
+            ...prev,
+            [newIndex]: { x: defaultX(newIndex), y: defaultY(newIndex), z: ++zRef.current }
+          }));
+        }}>
+          New MegaHabitat
+        </button>
       </div>
 
       <div className="app" style={{ position: 'fixed', top: 60, left: 0, right: 0, bottom: 0, display: "flex", gap: 0, overflow: 'hidden' }} onClick={handleGlobalClick}>
@@ -804,7 +958,7 @@ export default function App() {
 
               {rules.map((rule, rIndex) => (
                 <RuleCard
-                  key={rIndex}
+                  key={`rule-${rIndex}`}
                   index={rIndex}
                   rule={rule}
                   positions={positions}
@@ -815,6 +969,26 @@ export default function App() {
                   selected={selected}
                   setSelected={setSelected}
                   pokemonSuggestions={filteredPokemons}
+                  blockSuggestions={filteredBlocks}
+                />
+              ))}
+
+              {megaHabitats.map((mega, mIndex) => (
+                <MegaHabitatCard
+                  key={`mega-${mIndex}`}
+                  index={mIndex}
+                  megaHabitat={mega}
+                  positions={megaPositions}
+                  setPositions={setMegaPositions}
+                  bringToFront={(idx) => {
+                    setMegaPositions((prev) => {
+                      const next = { ...(prev || {}) };
+                      next[idx] = { ...(next[idx] || {}), z: ++zRef.current };
+                      return next;
+                    });
+                  }}
+                  megaHabitats={megaHabitats}
+                  setMegaHabitats={setMegaHabitats}
                   blockSuggestions={filteredBlocks}
                 />
               ))}
