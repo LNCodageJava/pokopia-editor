@@ -220,13 +220,13 @@ export default function MegaHabitatCard({
           {/* 6 pokémons */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(6, 1fr)',
+            gridTemplateColumns: 'repeat(3, 1fr)',
             gap: 4
           }}>
             {(megaHabitat.pokemons || Array(6).fill(null)).map((p, i) => (
               <div key={i} style={{
-                width: 32,
-                height: 32,
+                width: 64,
+                height: 64,
                 border: '2px solid #2b6cdf',
                 borderRadius: 4,
                 overflow: 'hidden',
