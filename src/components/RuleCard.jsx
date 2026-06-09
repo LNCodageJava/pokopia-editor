@@ -179,6 +179,23 @@ export default function RuleCard({
     setPokemon(null);
   }
 
+  function setCapacityBlockAt(slotIndex, blockId) {
+    const next = [...rules];
+    next[index] = { ...next[index], capacityBlocks: [...(next[index].capacityBlocks || Array(3).fill(null))] };
+    next[index].capacityBlocks[slotIndex] = blockId;
+    setRules(next);
+  }
+
+  function setAbility(ability) {
+    const next = [...rules];
+    next[index] = { ...next[index], ability };
+    setRules(next);
+  }
+
+  function removeCapacityBlock(slotIndex) {
+    setCapacityBlockAt(slotIndex, null);
+  }
+
   return (
     <div
       ref={ref}

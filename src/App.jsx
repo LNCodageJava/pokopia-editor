@@ -328,12 +328,23 @@ export default function App() {
 
         // Support new pokopia_data structure: { habitats: [ { name, hab, lvl }, ... ], capacities: [...] }
         if (data && Array.isArray(data.habitats)) {
-          const importedRules = data.habitats.map((h) => {
-            // Find corresponding capacity for this pokemon
-            const capacity = Array.isArray(data.capacities)
-              ? data.capacities.find(c => c.name === h.name)
-              : null;
+          // Créer un Map des habitats pour accès rapide
+          const habitatMap = new Map();
+          data.habitats.forEach(h => {
+            habitatMap.set(h.name, h);
+          });
 
+          // Créer un Map des capacités
+          const capacityMap = new Map();
+          if (Array.isArray(data.capacities)) {
+            data.capacities.forEach(c => {
+              capacityMap.set(c.name, c);
+            });
+          }
+
+          // Créer les règles depuis les habitats
+          const rulesFromHabitats = data.habitats.map((h) => {
+            const capacity = capacityMap.get(h.name);
             return {
               pattern: Array.isArray(h.hab)
                 ? h.hab.slice(0, 9).concat(Array(9 - h.hab.length).fill(null))
@@ -346,6 +357,28 @@ export default function App() {
                 : Array(3).fill(null),
             };
           });
+
+          // Trouver les Pokémon qui ont seulement des capacités mais pas d'habitat
+          const rulesFromCapacitiesOnly = [];
+          if (Array.isArray(data.capacities)) {
+            data.capacities.forEach(c => {
+              if (!habitatMap.has(c.name)) {
+                // Ce Pokémon a une capacité mais pas d'habitat
+                rulesFromCapacitiesOnly.push({
+                  pattern: Array(9).fill(null),
+                  pokemon: c.name,
+                  level: 0,
+                  ability: c.ability || null,
+                  capacityBlocks: Array.isArray(c.blocks)
+                    ? c.blocks.slice(0, 3).concat(Array(3 - c.blocks.length).fill(null))
+                    : Array(3).fill(null),
+                });
+              }
+            });
+          }
+
+          // Combiner les deux listes
+          const importedRules = [...rulesFromHabitats, ...rulesFromCapacitiesOnly];
 
           setRules(importedRules);
           return;
