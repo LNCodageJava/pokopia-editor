@@ -33,7 +33,7 @@ export default function PokemonAutocomplete({ value = '', suggestions = [], onSe
 
   useEffect(() => {
     setFiltered(
-      suggestions.filter((s) => s.toLowerCase().includes((input || '').toLowerCase())).slice(0, 10)
+      suggestions.filter((s) => s.toLowerCase().includes((input || '').toLowerCase())).slice(0, 50)
     );
     setHighlight(0);
   }, [input, suggestions]);
