@@ -3,6 +3,7 @@ import { DndContext, useDraggable, useDroppable } from "@dnd-kit/core";
 import "./App.css";
 import RuleCard from "./components/RuleCard";
 import MegaHabitatCard from "./components/MegaHabitatCard";
+import PokemonWeightCard from "./components/PokemonWeightCard";
 import ShapesLayer from "./components/ShapesLayer";
 import ImageWithFallback from "./components/ImageWithFallback";
 
@@ -10,6 +11,8 @@ const LAYOUT_KEY = "pokopia.rules.layout.v1";
 const MEGA_LAYOUT_KEY = "pokopia.megahabitats.layout.v1";
 const RULES_DATA_KEY = "pokopia.rules.data.v1";
 const MEGA_DATA_KEY = "pokopia.megahabitats.data.v1";
+const POKEMON_WEIGHT_DATA_KEY = "pokopia.pokemonweight.data.v1";
+const POKEMON_WEIGHT_LAYOUT_KEY = "pokopia.pokemonweight.layout.v1";
 
 // Charger dynamiquement tous les blocs depuis le dossier public/blocks
 // Format des fichiers: namespace__nom_block.png -> namespace:nom_block
@@ -26,6 +29,7 @@ const BLOCKS = Object.keys(blockImages)
   .sort();
 
 const POKEMONS = [
+    "ss",
     "bulbasaur", "ivysaur", "venusaur", "charmander", "charmeleon", "charizard",
     "squirtle", "wartortle", "blastoise", "caterpie", "metapod", "butterfree",
     "weedle", "kakuna", "beedrill", "pidgey", "pidgeotto", "pidgeot", "rattata",
@@ -157,9 +161,15 @@ const POKEMONS = [
     "tinkatuff", "tinkaton", "wiglett", "wugtrio", "finizen", "palafin",
     "varoom", "revavroom", "cyclizar", "orthworm", "glimmet", "glimmora",
     "flamigo", "cetoddle", "cetitan", "veluza", "dondozo", "tatsugiri",
-    "annihilape", "clodsire", "farigiraf", "dudunsparce", "gimmighoul [roaming]",
+    "annihilape", "clodsire", "farigiraf", "dudunsparce", "gimmighoul", "gholdengo",
     "poltchageist", "sinistcha"
   ];
+
+const evolutions = [
+    ["bidoof","bibarel"],
+    ["chimchar","monferno"],
+    ["sandshrew","sandslash"]
+    ]
 
 
 // Fonction pour récupérer l'image depuis le nom
@@ -239,6 +249,10 @@ export default function App() {
     pokemons: Array(6).fill(null),
   });
 
+  const createPokemonWeightCard = () => ({
+    pokemons: Array(6).fill(null).map(() => ({ name: null, weight: 1 })),
+  });
+
   const [rules, setRules] = useState(() => {
     try {
       const raw = localStorage.getItem(RULES_DATA_KEY);
@@ -253,6 +267,17 @@ export default function App() {
   const [megaHabitats, setMegaHabitats] = useState(() => {
     try {
       const raw = localStorage.getItem(MEGA_DATA_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (err) {}
+    return [];
+  });
+
+  const [pokemonWeightCards, setPokemonWeightCards] = useState(() => {
+    try {
+      const raw = localStorage.getItem(POKEMON_WEIGHT_DATA_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) return parsed;
@@ -322,6 +347,18 @@ export default function App() {
     return {};
   });
 
+  // positions for pokemon weight cards: { [index]: { x, y, z } }
+  const [pokemonWeightPositions, setPokemonWeightPositions] = useState(() => {
+    try {
+      const raw = localStorage.getItem(POKEMON_WEIGHT_LAYOUT_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.positions) return parsed.positions;
+      }
+    } catch (err) {}
+    return {};
+  });
+
   // track z-order
   const zRef = useRef(1);
   function bringToFront(indexOrArray) {
@@ -372,6 +409,18 @@ export default function App() {
     return () => clearTimeout(id);
   }, [megaHabitats]);
 
+  // save pokemon weight cards data when they change
+  useEffect(() => {
+    const id = setTimeout(() => {
+      try {
+        localStorage.setItem(POKEMON_WEIGHT_DATA_KEY, JSON.stringify(pokemonWeightCards));
+      } catch (err) {
+        console.error("Erreur sauvegarde pokemon weight cards", err);
+      }
+    }, 250);
+    return () => clearTimeout(id);
+  }, [pokemonWeightCards]);
+
   // save positions when they change (debounced)
   useEffect(() => {
     const id = setTimeout(() => {
@@ -411,6 +460,25 @@ export default function App() {
     return () => clearTimeout(id);
   }, [megaPositions]);
 
+  // save pokemon weight positions when they change
+  useEffect(() => {
+    const id = setTimeout(() => {
+      try {
+        localStorage.setItem(
+          POKEMON_WEIGHT_LAYOUT_KEY,
+          JSON.stringify({
+            version: 1,
+            positions: pokemonWeightPositions,
+            updatedAt: Date.now(),
+          }),
+        );
+      } catch (err) {
+        console.error("Erreur sauvegarde pokemon weight layout", err);
+      }
+    }, 250);
+    return () => clearTimeout(id);
+  }, [pokemonWeightPositions]);
+
   // persist shapes too when they change
   useEffect(() => {
     const id = setTimeout(() => {
@@ -429,6 +497,95 @@ export default function App() {
   }, [shapes, positions]);
 
   // -------------------------------
+  // Fonction pour générer les cartes pokémon/poids depuis les habitats
+  // -------------------------------
+  function generateOtherPokemons() {
+    const reader = new FileReader();
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      reader.onload = (event) => {
+        try {
+          const data = JSON.parse(event.target.result);
+          if (!data || !Array.isArray(data.habitats)) {
+            alert("Fichier JSON invalide : structure 'habitats' manquante");
+            return;
+          }
+
+          const newCards = [...pokemonWeightCards];
+          const newPositions = { ...pokemonWeightPositions };
+          const existingPokemonCards = new Set(
+            pokemonWeightCards.map(c => c.pokemons && c.pokemons[0]?.name).filter(Boolean)
+          );
+
+          // Position de départ à droite (x = 3000)
+          let currentIndex = pokemonWeightCards.length;
+          const startX = 6000;
+          const startY = 20;
+
+          data.habitats.forEach(habitat => {
+            if (!habitat.name) return;
+
+            // Vérifier si une carte existe déjà pour ce pokémon (basé sur habitat.name)
+            if (existingPokemonCards.has(habitat.name)) return;
+
+            // Créer un tableau de 6 emplacements
+            const cardPokemons = Array(6).fill(null).map(() => ({ name: null, weight: 1 }));
+
+            // Si l'habitat a une clé pokemons, remplir les emplacements
+            if (habitat.pokemons && habitat.pokemons.length > 0) {
+              habitat.pokemons.forEach((p, i) => {
+                if (i < 6) {
+                  cardPokemons[i] = {
+                    name: p.name || null,
+                    weight: p.weight || 1
+                  };
+                }
+              });
+            } else {
+              // Sinon, juste le pokémon principal dans le premier emplacement
+              cardPokemons[0] = {
+                name: habitat.name,
+                weight: 1
+              };
+            }
+
+            const newCard = {
+              pokemons: cardPokemons
+            };
+
+            // Position en grille à partir de startX
+            newPositions[currentIndex] = {
+              x: startX + (currentIndex % 5) * 450,
+              y: startY + Math.floor(currentIndex / 5) * 280,
+              z: ++zRef.current
+            };
+
+            newCards.push(newCard);
+            existingPokemonCards.add(habitat.name);
+            currentIndex++;
+          });
+
+          setPokemonWeightCards(newCards);
+          setPokemonWeightPositions(newPositions);
+        } catch (err) {
+          console.error(err);
+          alert("Erreur en lisant le fichier JSON : " + err.message);
+        }
+      };
+
+      reader.readAsText(file);
+    };
+
+    input.click();
+  }
+
+  // -------------------------------
   // Fonction import JSON
   // -------------------------------
   const importJSON = (e) => {
@@ -437,6 +594,7 @@ export default function App() {
 
     const reader = new FileReader();
     reader.onload = (event) => {
+      e.target.value = null; // Reset input pour permettre de réimporter le même fichier
       try {
         const data = JSON.parse(event.target.result);
 
@@ -472,6 +630,26 @@ export default function App() {
             };
           });
 
+          // Créer les cartes pokémon/poids depuis les habitats
+          const importedPokemonWeightCards = data.habitats
+            .filter(h => h.pokemons && h.pokemons.length > 0)
+            .map(h => {
+              // Créer un tableau de 6 emplacements
+              const cardPokemons = Array(6).fill(null).map(() => ({ name: null, weight: 1 }));
+
+              // Remplir avec les pokémons de l'habitat
+              h.pokemons.forEach((p, i) => {
+                if (i < 6) {
+                  cardPokemons[i] = {
+                    name: p.name || null,
+                    weight: p.weight || 1
+                  };
+                }
+              });
+
+              return { pokemons: cardPokemons };
+            });
+
           // Trouver les Pokémon qui ont seulement des capacités mais pas d'habitat
           const rulesFromCapacitiesOnly = [];
           if (Array.isArray(data.capacities)) {
@@ -498,13 +676,38 @@ export default function App() {
           const importedMegaHabitats = [];
           if (Array.isArray(data.mega_habitats)) {
             data.mega_habitats.forEach(m => {
-              // Create blockList, filling with null to reach 30 slots
+              // Create blockList, filling with null to reach 30 slots (6 lignes de 5)
               const blockList = Array(30).fill(null);
-              const sourceBlocks = m.blockList || m.biomes; // support both blockList and biomes
-              if (Array.isArray(sourceBlocks)) {
-                sourceBlocks.forEach((b, i) => {
-                  if (i < 30) blockList[i] = b;
+
+              // Support du nouveau format "recipes" et de l'ancien format "biomes" ou "blockList"
+              if (Array.isArray(m.recipes)) {
+                // Nouveau format: recipes avec ingredients et result
+                m.recipes.forEach((recipe, recipeIndex) => {
+                  if (recipeIndex >= 6) return; // Max 6 recettes/lignes
+                  const lineStart = recipeIndex * 5;
+
+                  // Placer les ingredients (max 4)
+                  if (Array.isArray(recipe.ingredients)) {
+                    recipe.ingredients.forEach((ing, i) => {
+                      if (i < 4 && ing) {
+                        blockList[lineStart + i] = ing;
+                      }
+                    });
+                  }
+
+                  // Placer le result en 5ème position
+                  if (recipe.result) {
+                    blockList[lineStart + 4] = recipe.result;
+                  }
                 });
+              } else {
+                // Ancien format: blockList ou biomes en liste linéaire
+                const sourceBlocks = m.blockList || m.biomes;
+                if (Array.isArray(sourceBlocks)) {
+                  sourceBlocks.forEach((b, i) => {
+                    if (i < 30) blockList[i] = b;
+                  });
+                }
               }
 
               // Create pokemons array, filling with null to reach 6 slots
@@ -525,6 +728,7 @@ export default function App() {
 
           setRules(importedRules);
           setMegaHabitats(importedMegaHabitats);
+          setPokemonWeightCards(importedPokemonWeightCards);
           return;
         }
 
@@ -566,7 +770,21 @@ export default function App() {
         if (!r.pokemon) return null; // export only entries that have a pokemon name
         // produce hab array by removing nulls and limiting to 9
         const hab = (r.pattern || []).slice(0, 9).filter((x) => x != null);
-        return { name: r.pokemon, hab, lvl: r.level ?? 0 };
+
+        // Ajouter pokemons depuis les pokemonWeightCards si disponible
+        const matchingCard = pokemonWeightCards.find(c =>
+          c.pokemons && c.pokemons[0]?.name === r.pokemon
+        );
+
+        const pokemonsData = matchingCard
+          ? matchingCard.pokemons.filter(p => p && p.name).map(p => ({ name: p.name, weight: p.weight }))
+          : undefined;
+
+        const result = { name: r.pokemon, hab, lvl: r.level ?? 0 };
+        if (pokemonsData && pokemonsData.length > 0) {
+          result.pokemons = pokemonsData;
+        }
+        return result;
       })
       .filter(Boolean);
 
@@ -586,9 +804,29 @@ export default function App() {
     const mega_habitats = megaHabitats
       .map((m) => {
         if (!m.name) return null; // export only entries with a name
-        const biomes = (m.blockList || []).slice(0, 30).filter((x) => x != null);
+
+        // Convertir blockList (30 slots) en recettes (6 lignes de 5)
+        const recipes = [];
+        const blockList = m.blockList || [];
+
+        for (let i = 0; i < 6; i++) {
+          const lineStart = i * 5;
+          const line = blockList.slice(lineStart, lineStart + 5);
+
+          // Si la ligne a au moins un block non-null, créer une recette
+          if (line.some(b => b != null)) {
+            const ingredients = line.slice(0, 4).filter(b => b != null);
+            const result = line[4] || null;
+
+            // Ne créer une recette que si on a au moins un ingrédient et un résultat
+            if (ingredients.length > 0 && result) {
+              recipes.push({ ingredients, result });
+            }
+          }
+        }
+
         const pokemons = (m.pokemons || []).slice(0, 6).filter((x) => x != null);
-        return { name: m.name, biomes, pokemons };
+        return { name: m.name, recipes, pokemons };
       })
       .filter(Boolean);
 
@@ -924,6 +1162,25 @@ export default function App() {
         }}>
           New MegaHabitat
         </button>
+
+        <div style={{ borderLeft: '2px solid #ccc', height: 30, marginLeft: 10, marginRight: 10 }}></div>
+
+        <button onClick={() => {
+          const newCard = createPokemonWeightCard();
+          const newCards = [...pokemonWeightCards, newCard];
+          const newIndex = pokemonWeightCards.length;
+          setPokemonWeightCards(newCards);
+          setPokemonWeightPositions(prev => ({
+            ...prev,
+            [newIndex]: { x: defaultX(newIndex), y: defaultY(newIndex), z: ++zRef.current }
+          }));
+        }}>
+          New Pokemon Weight Card
+        </button>
+
+        <button onClick={generateOtherPokemons}>
+          Generate Other Pokemons
+        </button>
       </div>
 
       <div className="app" style={{ position: 'fixed', top: 60, left: 0, right: 0, bottom: 0, display: "flex", gap: 0, overflow: 'hidden' }} onClick={handleGlobalClick}>
@@ -1018,6 +1275,31 @@ export default function App() {
                   setMegaHabitats={setMegaHabitats}
                   pokemonSuggestions={filteredPokemons}
                   blockSuggestions={filteredBlocks}
+                />
+              ))}
+
+              {pokemonWeightCards.map((card, pwIndex) => (
+                <PokemonWeightCard
+                  key={`pokemonweight-${pwIndex}`}
+                  index={pwIndex}
+                  card={card}
+                  positions={pokemonWeightPositions}
+                  setPositions={setPokemonWeightPositions}
+                  bringToFront={(idx) => {
+                    setPokemonWeightPositions((prev) => {
+                      const next = { ...(prev || {}) };
+                      const indices = Array.isArray(idx) ? idx : [idx];
+                      indices.forEach((i) => {
+                        next[i] = { ...(next[i] || {}), z: ++zRef.current };
+                      });
+                      return next;
+                    });
+                  }}
+                  cards={pokemonWeightCards}
+                  setCards={setPokemonWeightCards}
+                  pokemonSuggestions={filteredPokemons}
+                  selected={selected}
+                  setSelected={setSelected}
                 />
               ))}
               {/* context menu for shapes */}

@@ -26,6 +26,7 @@ export default function RuleCard({
   blockSuggestions,
   selected = [],
   setSelected,
+  habitatsData,
 }) {
   const ref = useRef(null);
   const draggingRef = useRef({});
@@ -46,6 +47,38 @@ export default function RuleCard({
     el.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
     el.style.zIndex = pos.z || 0;
   }, [pos.x, pos.y, pos.z]);
+
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if ((e.key === "Delete" || e.key === "Suppr") && isSelected) {
+        e.preventDefault();
+        // Supprimer toutes les cartes sélectionnées
+        const indicesToDelete = Array.isArray(selected) ? selected : [index];
+        const newRules = rules.filter((_, i) => !indicesToDelete.includes(i));
+        setRules(newRules);
+
+        // Réinitialiser les positions
+        const newPositions = {};
+        Object.keys(positions || {}).forEach((key) => {
+          const oldIndex = parseInt(key);
+          if (!indicesToDelete.includes(oldIndex)) {
+            // Calculer le nouvel index après suppression
+            const newIndex = oldIndex - indicesToDelete.filter(i => i < oldIndex).length;
+            newPositions[newIndex] = positions[oldIndex];
+          }
+        });
+        setPositions(newPositions);
+
+        // Réinitialiser la sélection
+        if (setSelected) {
+          setSelected([]);
+        }
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isSelected, selected, index, rules, setRules, positions, setPositions, setSelected]);
 
   function onPointerDown(e) {
     if (e.button === 2) return;
@@ -196,6 +229,64 @@ export default function RuleCard({
     setCapacityBlockAt(slotIndex, null);
   }
 
+  function setPokemonAtSlot(slotIndex, pokemonId) {
+    const next = [...rules];
+    const pokemons = next[index].pokemons || Array(6).fill(null).map(() => ({ name: null, weight: 1 }));
+    pokemons[slotIndex] = { ...pokemons[slotIndex], name: pokemonId };
+    next[index] = { ...next[index], pokemons };
+    setRules(next);
+  }
+
+  function setWeightAtSlot(slotIndex, weight) {
+    const next = [...rules];
+    const pokemons = next[index].pokemons || Array(6).fill(null).map(() => ({ name: null, weight: 1 }));
+    pokemons[slotIndex] = { ...pokemons[slotIndex], weight: parseFloat(weight) || 1 };
+    next[index] = { ...next[index], pokemons };
+    setRules(next);
+  }
+
+  function removePokemonAtSlot(slotIndex) {
+    const next = [...rules];
+    const pokemons = next[index].pokemons || Array(6).fill(null).map(() => ({ name: null, weight: 1 }));
+    pokemons[slotIndex] = { name: null, weight: 1 };
+    next[index] = { ...next[index], pokemons };
+    setRules(next);
+  }
+
+  function generateOtherPokemons() {
+    if (!habitatsData || !habitatsData.habitats) return;
+
+    const newRules = [...rules];
+    const existingPokemonCards = new Set(
+      rules.filter(r => r.pokemons && r.pokemons.length > 0).map(r => r.pokemons[0]?.name).filter(Boolean)
+    );
+
+    habitatsData.habitats.forEach(habitat => {
+      if (!habitat.pokemons || habitat.pokemons.length === 0) return;
+
+      habitat.pokemons.forEach(pokemon => {
+        if (existingPokemonCards.has(pokemon.name)) return;
+
+        const newRule = {
+          pattern: Array(9).fill(null),
+          pokemon: null,
+          level: habitat.lvl || 0,
+          capacityBlocks: Array(3).fill(null),
+          ability: null,
+          pokemons: [
+            pokemon,
+            ...habitat.pokemons.filter(p => p.name !== pokemon.name)
+          ].slice(0, 6)
+        };
+
+        newRules.push(newRule);
+        existingPokemonCards.add(pokemon.name);
+      });
+    });
+
+    setRules(newRules);
+  }
+
   return (
     <div
       ref={ref}
@@ -207,40 +298,63 @@ export default function RuleCard({
     >
       <div className="ruleCard__body">
         <div className="ruleCard__left">
-          <div className="ruleCard__preview">
-            {(rule.pattern || Array(9).fill(null)).map((b, i) => (
-              <div key={i} className="ruleCard__cell">
-                {b && (
-                  <ImageWithFallback
-                    src={getImage(b)}
-                    labelId={b}
-                    alt={b}
-                    className="ruleCard__cellImg"
-                    style={{ imageRendering: "pixelated" }}
-                  />
-                )}
+          {/* Affichage des pokemons avec poids si disponible */}
+          {rule.pokemons && rule.pokemons.length > 0 ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, padding: 4 }}>
+              {rule.pokemons.slice(0, 6).map((p, i) => (
+                <div key={i} style={{ textAlign: 'center', fontSize: 9 }}>
+                  <div style={{ width: 24, height: 24, border: '1px solid #ddd', borderRadius: 2, overflow: 'hidden', margin: '0 auto' }}>
+                    {p?.name && (
+                      <ImageWithFallback
+                        src={getImage(p.name)}
+                        labelId={p.name}
+                        alt={p.name}
+                        style={{ width: '100%', height: '100%', imageRendering: "pixelated" }}
+                      />
+                    )}
+                  </div>
+                  <div style={{ marginTop: 2, fontWeight: 'bold' }}>{p?.weight || 1}</div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <>
+              <div className="ruleCard__preview">
+                {(rule.pattern || Array(9).fill(null)).map((b, i) => (
+                  <div key={i} className="ruleCard__cell">
+                    {b && (
+                      <ImageWithFallback
+                        src={getImage(b)}
+                        labelId={b}
+                        alt={b}
+                        className="ruleCard__cellImg"
+                        style={{ imageRendering: "pixelated" }}
+                      />
+                    )}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
 
-          {/* Capacity section */}
-          <div style={{ marginTop: 8, fontSize: 11, fontWeight: 'bold', textAlign: 'center', color: '#555' }}>
-            {rule.ability || '—'}
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2, marginTop: 4 }}>
-            {(rule.capacityBlocks || Array(3).fill(null)).map((b, i) => (
-              <div key={i} style={{ width: 24, height: 24, border: '1px solid #ddd', borderRadius: 2, overflow: 'hidden' }}>
-                {b && (
-                  <ImageWithFallback
-                    src={getImage(b)}
-                    labelId={b}
-                    alt={b}
-                    style={{ width: '100%', height: '100%', imageRendering: "pixelated" }}
-                  />
-                )}
+              {/* Capacity section */}
+              <div style={{ marginTop: 8, fontSize: 11, fontWeight: 'bold', textAlign: 'center', color: '#555' }}>
+                {rule.ability || '—'}
               </div>
-            ))}
-          </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2, marginTop: 4 }}>
+                {(rule.capacityBlocks || Array(3).fill(null)).map((b, i) => (
+                  <div key={i} style={{ width: 24, height: 24, border: '1px solid #ddd', borderRadius: 2, overflow: 'hidden' }}>
+                    {b && (
+                      <ImageWithFallback
+                        src={getImage(b)}
+                        labelId={b}
+                        alt={b}
+                        style={{ width: '100%', height: '100%', imageRendering: "pixelated" }}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
         <div className="ruleCard__right">
@@ -270,6 +384,19 @@ export default function RuleCard({
           <div className="ruleCard__rightSpacer" />
 
           <div className="ruleCard__editContainer">
+            {index === 0 && (
+              <button
+                className="ruleCard__editBtn"
+                style={{ marginBottom: 8 }}
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  generateOtherPokemons();
+                }}
+              >
+                Generate Other Pokemons
+              </button>
+            )}
             <button
               className="ruleCard__editBtn"
               onPointerDown={(e) => e.stopPropagation()}
@@ -279,7 +406,7 @@ export default function RuleCard({
               }}
             >
               {" "}
-              {editing ? "Fermer" : "Éditer"}{" "}
+              {editing ? "Éditer" : "Éditer"}{" "}
             </button>
           </div>
         </div>
@@ -295,46 +422,73 @@ export default function RuleCard({
             top: Math.min(pos.y, window.innerHeight - 100)
           }}
         >
+          <button
+            className="ruleCard__closeBtn"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              setEditing(false);
+            }}
+            style={{
+              position: 'absolute',
+              top: 8,
+              right: 8,
+              background: '#ff4444',
+              color: 'white',
+              border: 'none',
+              borderRadius: 4,
+              padding: '4px 8px',
+              cursor: 'pointer',
+              fontSize: 12,
+              fontWeight: 'bold',
+              zIndex: 10
+            }}
+          >
+            ✕
+          </button>
           <div className="ruleCard__editorInner">
-            <div className="ruleCard__blocksCol">
-              <div className="ruleCard__blocksGrid">
-                {(rule.pattern || Array(9).fill(null)).map((b, i) => (
-                  <div key={i} className="ruleCard__blockCell">
-                    <button
-                      className={
-                        "ruleCard__blockBtn" +
-                        (activeType === "block" && activeSlot === i
-                          ? " ruleCard__blockBtn--active"
-                          : "")
-                      }
-                      onPointerDown={(e) => e.stopPropagation()}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveType("block");
-                        setActiveSlot(i);
-                      }}
-                    >
-                      {b ? (
+            {/* Editeur pour le mode pokemons */}
+            {rule.pokemons && rule.pokemons.length > 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
+                {rule.pokemons.slice(0, 6).map((p, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: 4, border: '1px solid #ddd', borderRadius: 4 }}>
+                    <div style={{ width: 32, height: 32, border: '1px solid #ccc', borderRadius: 2, overflow: 'hidden' }}>
+                      {p?.name && (
                         <ImageWithFallback
-                          src={getImage(b)}
-                          labelId={b}
-                          alt={b}
-                          className="ruleCard__blockImg"
-                          style={{ imageRendering: "pixelated" }}
+                          src={getImage(p.name)}
+                          labelId={p.name}
+                          alt={p.name}
+                          style={{ width: '100%', height: '100%', imageRendering: "pixelated" }}
                         />
-                      ) : (
-                        <div className="ruleCard__blockPlaceholder">
-                          {i + 1}
-                        </div>
                       )}
-                    </button>
-                    {b && (
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <PokemonAutocomplete
+                        value={p?.name || ""}
+                        suggestions={pokemonSuggestions}
+                        onSelect={(pokemonId) => setPokemonAtSlot(i, pokemonId)}
+                        placeholder={`Pokemon ${i + 1}`}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <span style={{ fontSize: 11 }}>Poids:</span>
+                      <input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        value={p?.weight || 1}
+                        onChange={(e) => setWeightAtSlot(i, e.target.value)}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        style={{ width: 60, padding: 4, fontSize: 11 }}
+                      />
+                    </div>
+                    {p?.name && (
                       <button
                         className="ruleCard__removeBtn"
                         onPointerDown={(e) => e.stopPropagation()}
                         onClick={(e) => {
                           e.stopPropagation();
-                          removeBlock(i);
+                          removePokemonAtSlot(i);
                         }}
                       >
                         X
@@ -343,86 +497,207 @@ export default function RuleCard({
                   </div>
                 ))}
               </div>
-            </div>
-
-            <div className="ruleCard__rightCol">
-              <div className="ruleCard__pokemonRow">
-                <div className="ruleCard__pokemonThumbLarge">
-                  {rule.pokemon ? (
-                    <ImageWithFallback
-                      src={getImage(rule.pokemon)}
-                      labelId={rule.pokemon}
-                      alt={rule.pokemon}
-                      className="ruleCard__pokemonImgLarge"
-                      style={{ imageRendering: "pixelated" }}
-                    />
-                  ) : (
-                    <div className="ruleCard__pokemonPlaceholder">Pokémon</div>
-                  )}
-                </div>
-                <div>
-                  <div className="ruleCard__labelSmall">Pokémon</div>
-                  <div className="ruleCard__pokemonActions">
-                    <button
-                      className="ruleCard__chooseBtn"
-                      onPointerDown={(e) => e.stopPropagation()}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveType("pokemon");
-                      }}
-                    >
-                      Choisir
-                    </button>
-                    {rule.pokemon && (
+            ) : (
+              <div className="ruleCard__blocksCol">
+                <div className="ruleCard__blocksGrid">
+                  {(rule.pattern || Array(9).fill(null)).map((b, i) => (
+                    <div key={i} className="ruleCard__blockCell">
                       <button
-                        className="ruleCard__removeBtn"
+                        className={
+                          "ruleCard__blockBtn" +
+                          (activeType === "block" && activeSlot === i
+                            ? " ruleCard__blockBtn--active"
+                            : "")
+                        }
                         onPointerDown={(e) => e.stopPropagation()}
                         onClick={(e) => {
                           e.stopPropagation();
-                          removePokemon();
+                          setActiveType("block");
+                          setActiveSlot(i);
                         }}
                       >
-                        Suppr
+                        {b ? (
+                          <ImageWithFallback
+                            src={getImage(b)}
+                            labelId={b}
+                            alt={b}
+                            className="ruleCard__blockImg"
+                            style={{ imageRendering: "pixelated" }}
+                          />
+                        ) : (
+                          <div className="ruleCard__blockPlaceholder">
+                            {i + 1}
+                          </div>
+                        )}
                       </button>
-                    )}
-                  </div>
+                      {b && (
+                        <button
+                          className="ruleCard__removeBtn"
+                          onPointerDown={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeBlock(i);
+                          }}
+                        >
+                          X
+                        </button>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
+            )}
 
-              <div className="ruleCard__levelRow">
-                <div className="ruleCard__labelSmall">Niveau</div>
-                <input
-                  type="number"
-                  className="ruleCard__levelInput"
-                  value={rule.level ?? 0}
-                  onChange={(e) => setLevel(e.target.value)}
-                  onPointerDown={(e) => e.stopPropagation()}
-                />
-              </div>
+            {!(rule.pokemons && rule.pokemons.length > 0) && (
+              <div className="ruleCard__rightCol">
+                <div className="ruleCard__pokemonRow">
+                  <div className="ruleCard__pokemonThumbLarge">
+                    {rule.pokemon ? (
+                      <ImageWithFallback
+                        src={getImage(rule.pokemon)}
+                        labelId={rule.pokemon}
+                        alt={rule.pokemon}
+                        className="ruleCard__pokemonImgLarge"
+                        style={{ imageRendering: "pixelated" }}
+                      />
+                    ) : (
+                      <div className="ruleCard__pokemonPlaceholder">Pokémon</div>
+                    )}
+                  </div>
+                  <div>
+                    <div className="ruleCard__labelSmall">Pokémon</div>
+                    <div className="ruleCard__pokemonActions">
+                      <button
+                        className="ruleCard__chooseBtn"
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveType("pokemon");
+                        }}
+                      >
+                        Choisir
+                      </button>
+                      {rule.pokemon && (
+                        <button
+                          className="ruleCard__removeBtn"
+                          onPointerDown={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removePokemon();
+                          }}
+                        >
+                          Suppr
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
 
-              <div className="ruleCard__autocompleteRow">
-                <div className="ruleCard__labelSmall">Recherche</div>
-                {activeType === "pokemon" ? (
-                  <PokemonAutocomplete
-                    value={rule.pokemon || ""}
-                    suggestions={pokemonSuggestions}
-                    onSelect={(p) => {
-                      setPokemon(p);
-                    }}
-                    placeholder={`Choisir Pokémon`}
+                <div className="ruleCard__levelRow">
+                  <div className="ruleCard__labelSmall">Niveau</div>
+                  <input
+                    type="number"
+                    className="ruleCard__levelInput"
+                    value={rule.level ?? 0}
+                    onChange={(e) => setLevel(e.target.value)}
+                    onPointerDown={(e) => e.stopPropagation()}
                   />
-                ) : (
-                  <PokemonAutocomplete
-                    value={rule.pattern[activeSlot] || ""}
-                    suggestions={blockSuggestions}
-                    onSelect={(b) => {
-                      setBlockAt(activeSlot, b);
-                    }}
-                    placeholder={`Choisir bloc`}
+                </div>
+
+                <div className="ruleCard__levelRow">
+                  <div className="ruleCard__labelSmall">Ability</div>
+                  <input
+                    type="text"
+                    className="ruleCard__levelInput"
+                    value={rule.ability || ""}
+                    onChange={(e) => setAbility(e.target.value)}
+                    onPointerDown={(e) => e.stopPropagation()}
+                    placeholder="Nom de l'ability"
                   />
-                )}
+                </div>
+
+                <div className="ruleCard__labelSmall" style={{ marginTop: 8 }}>Capacity Blocks</div>
+                <div style={{ display: 'flex', gap: 4, marginBottom: 8 }}>
+                  {(rule.capacityBlocks || Array(3).fill(null)).map((b, i) => (
+                    <div key={i} style={{ position: 'relative' }}>
+                      <button
+                        className={
+                          "ruleCard__blockBtn" +
+                          (activeType === "capacity" && activeSlot === i
+                            ? " ruleCard__blockBtn--active"
+                            : "")
+                        }
+                        style={{ width: 48, height: 48 }}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveType("capacity");
+                          setActiveSlot(i);
+                        }}
+                      >
+                        {b ? (
+                          <ImageWithFallback
+                            src={getImage(b)}
+                            labelId={b}
+                            alt={b}
+                            style={{ width: '100%', height: '100%', imageRendering: "pixelated" }}
+                          />
+                        ) : (
+                          <div className="ruleCard__blockPlaceholder">
+                            {i + 1}
+                          </div>
+                        )}
+                      </button>
+                      {b && (
+                        <button
+                          className="ruleCard__removeBtn"
+                          style={{ position: 'absolute', top: -4, right: -4 }}
+                          onPointerDown={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeCapacityBlock(i);
+                          }}
+                        >
+                          X
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="ruleCard__autocompleteRow">
+                  <div className="ruleCard__labelSmall">Recherche</div>
+                  {activeType === "pokemon" ? (
+                    <PokemonAutocomplete
+                      value={rule.pokemon || ""}
+                      suggestions={pokemonSuggestions}
+                      onSelect={(p) => {
+                        setPokemon(p);
+                      }}
+                      placeholder={`Choisir Pokémon`}
+                    />
+                  ) : activeType === "capacity" ? (
+                    <PokemonAutocomplete
+                      value={rule.capacityBlocks?.[activeSlot] || ""}
+                      suggestions={blockSuggestions}
+                      onSelect={(b) => {
+                        setCapacityBlockAt(activeSlot, b);
+                      }}
+                      placeholder={`Choisir capacity bloc ${activeSlot + 1}`}
+                    />
+                  ) : (
+                    <PokemonAutocomplete
+                      value={rule.pattern[activeSlot] || ""}
+                      suggestions={blockSuggestions}
+                      onSelect={(b) => {
+                        setBlockAt(activeSlot, b);
+                      }}
+                      placeholder={`Choisir bloc`}
+                    />
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       )}

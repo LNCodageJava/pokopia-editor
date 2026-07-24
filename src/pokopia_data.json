@@ -9,6 +9,20 @@
         "minecraft:water_bucket",
         "minecraft:water_bucket"
       ],
+      "pokemons": [
+        {
+          "name": "krookodile",
+          "weight": 0.5
+        },
+        {
+          "name": "cacnea",
+          "weight": 1
+        },
+        {
+          "name": "cacturne",
+          "weight": 1
+        }
+      ],
       "lvl": 10
     },
     {
@@ -24,6 +38,20 @@
         "minecraft:cut_sandstone_slab",
         "minecraft:cut_sandstone_slab"
       ],
+      "pokemons": [
+        {
+          "name": "hippopotas",
+          "weight": 1
+        },
+        {
+          "name": "sandshrew",
+          "weight": 1
+        },
+        {
+          "name": "cubone",
+          "weight": 1
+        }
+      ],
       "lvl": 20
     },
     {
@@ -34,6 +62,20 @@
         "minecraft:chiseled_sandstone",
         "minecraft:chiseled_sandstone",
         "minecraft:chiseled_sandstone"
+      ],
+      "pokemons": [
+        {
+          "name": "camerupt",
+          "weight": 1
+        },
+        {
+          "name": "sandslash",
+          "weight": 1
+        },
+        {
+          "name": "marowak",
+          "weight": 1
+        }
       ],
       "lvl": 10
     },
@@ -50,6 +92,24 @@
         "cobblemonfury:silice_melted",
         "cobblemonfury:silice_melted"
       ],
+      "pokemons": [
+        {
+          "name": "trapinch",
+          "weight": 1
+        },
+        {
+          "name": "sandygast",
+          "weight": 1
+        },
+        {
+          "name": "baltoy",
+          "weight": 1
+        },
+        {
+          "name": "gligar",
+          "weight": 1
+        }
+      ],
       "lvl": 30
     },
     {
@@ -57,12 +117,32 @@
       "hab": [
         "cobblemon:leaf_stone"
       ],
+      "pokemons": [
+        {
+          "name": "leafeon",
+          "weight": 0.5
+        },
+        {
+          "name": "evee",
+          "weight": 1
+        }
+      ],
       "lvl": 40
     },
     {
       "name": "espeon",
       "hab": [
         "cobblemon:sun_stone"
+      ],
+      "pokemons": [
+        {
+          "name": "espeon",
+          "weight": 0.5
+        },
+        {
+          "name": "evee",
+          "weight": 1
+        }
       ],
       "lvl": 40
     },
@@ -74,6 +154,24 @@
         "minecraft:torch",
         "minecraft:torch"
       ],
+      "pokemons": [
+        {
+          "name": "chimchar",
+          "weight": 0.5
+        },
+        {
+          "name": "torchic",
+          "weight": 1
+        },
+        {
+          "name": "scorbunny",
+          "weight": 1
+        },
+        {
+          "name": "cyndaquil",
+          "weight": 1
+        }
+      ],
       "lvl": 10
     },
     {
@@ -82,6 +180,20 @@
         "minecraft:campfire",
         "minecraft:campfire",
         "minecraft:campfire"
+      ],
+      "pokemons": [
+        {
+          "name": "torkoal",
+          "weight": 0.5
+        },
+        {
+          "name": "turtonator",
+          "weight": 1
+        },
+        {
+          "name": "magcargo",
+          "weight": 1
+        }
       ],
       "lvl": 20
     },
@@ -98,6 +210,20 @@
         "cobblemonfury:block_charbon_inc",
         "cobblemonfury:block_charbon_inc"
       ],
+      "pokemons": [
+        {
+          "name": "emboar",
+          "weight": 0.5
+        },
+        {
+          "name": "incineroar",
+          "weight": 1
+        },
+        {
+          "name": "blaziken",
+          "weight": 1
+        }
+      ],
       "lvl": 30
     },
     {
@@ -113,6 +239,20 @@
         "minecraft:lava_bucket",
         "minecraft:lava_bucket"
       ],
+      "pokemons": [
+        {
+          "name": "heatmor",
+          "weight": 0.5
+        },
+        {
+          "name": "slugma",
+          "weight": 1
+        },
+        {
+          "name": "numel",
+          "weight": 1
+        }
+      ],
       "lvl": 20
     },
     {
@@ -124,12 +264,40 @@
         "minecraft:lava_bucket",
         "minecraft:lava_bucket"
       ],
+      "pokemons": [
+        {
+          "name": "magmar",
+          "weight": 0.5
+        },
+        {
+          "name": "pansear",
+          "weight": 1
+        },
+        {
+          "name": "larvesta",
+          "weight": 1
+        }
+      ],
       "lvl": 20
     },
     {
       "name": "garganacl",
       "hab": [
-        "minecraft:deepslate_diamond_ore"
+        "minecraft:diamond_ore"
+      ],
+      "pokemons": [
+        {
+          "name": "garganacl",
+          "weight": 1
+        },
+        {
+          "name": "aggron",
+          "weight": 1
+        },
+        {
+          "name": "gigalith",
+          "weight": 1
+        }
       ],
       "lvl": 20
     },
@@ -140,12 +308,44 @@
         "minecraft:iron_ore",
         "minecraft:iron_ore"
       ],
+      "pokemons": [
+        {
+          "name": "graveler",
+          "weight": 0.5
+        },
+        {
+          "name": "boldore",
+          "weight": 1
+        },
+        {
+          "name": "lairon",
+          "weight": 1
+        }
+      ],
       "lvl": 20
     },
     {
       "name": "machop",
       "hab": [
         "minecraft:anvil"
+      ],
+      "pokemons": [
+        {
+          "name": "machop",
+          "weight": 1
+        },
+        {
+          "name": "timburr",
+          "weight": 1
+        },
+        {
+          "name": "makuhita",
+          "weight": 1
+        },
+        {
+          "name": "mankey",
+          "weight": 1
+        }
       ],
       "lvl": 20
     },
@@ -154,6 +354,12 @@
       "hab": [
         "minecraft:lapis_ore",
         "minecraft:redstone_ore"
+      ],
+      "pokemons": [
+        {
+          "name": "ditto",
+          "weight": 1
+        }
       ],
       "lvl": 20
     },
@@ -170,12 +376,48 @@
         "minecraft:copper_block",
         "minecraft:copper_block"
       ],
+      "pokemons": [
+        {
+          "name": "magnemite",
+          "weight": 1
+        },
+        {
+          "name": "voltorb",
+          "weight": 1
+        },
+        {
+          "name": "klink",
+          "weight": 1
+        },
+        {
+          "name": "beldum",
+          "weight": 1
+        }
+      ],
       "lvl": 20
     },
     {
       "name": "dugtrio",
       "hab": [
         "minecraft:powered_rail"
+      ],
+      "pokemons": [
+        {
+          "name": "dugtrio",
+          "weight": 1
+        },
+        {
+          "name": "wugtrio",
+          "weight": 1
+        },
+        {
+          "name": "dodrio",
+          "weight": 1
+        },
+        {
+          "name": "sandslash",
+          "weight": 1
+        }
       ],
       "lvl": 30
     },
@@ -189,6 +431,24 @@
         "minecraft:chiseled_stone_bricks",
         "minecraft:chiseled_stone_bricks"
       ],
+      "pokemons": [
+        {
+          "name": "excadrill",
+          "weight": 1
+        },
+        {
+          "name": "steelix",
+          "weight": 1
+        },
+        {
+          "name": "donphan",
+          "weight": 1
+        },
+        {
+          "name": "sandslash",
+          "weight": 1
+        }
+      ],
       "lvl": 40
     },
     {
@@ -200,6 +460,24 @@
         "minecraft:blackstone_stairs",
         "minecraft:blackstone_stairs"
       ],
+      "pokemons": [
+        {
+          "name": "rhyhorn",
+          "weight": 1
+        },
+        {
+          "name": "lairon",
+          "weight": 1
+        },
+        {
+          "name": "donphan",
+          "weight": 1
+        },
+        {
+          "name": "bastiodon",
+          "weight": 1
+        }
+      ],
       "lvl": 20
     },
     {
@@ -207,6 +485,24 @@
       "hab": [
         "cobblemon:pinap_berry",
         "cobblemon:wepear_berry"
+      ],
+      "pokemons": [
+        {
+          "name": "mareep",
+          "weight": 1
+        },
+        {
+          "name": "wooloo",
+          "weight": 1
+        },
+        {
+          "name": "yamper",
+          "weight": 1
+        },
+        {
+          "name": "blitzle",
+          "weight": 1
+        }
       ],
       "lvl": 10
     },
@@ -220,12 +516,40 @@
         "minecraft:hay_block",
         "minecraft:hay_block"
       ],
+      "pokemons": [
+        {
+          "name": "miltank",
+          "weight": 1
+        },
+        {
+          "name": "bouffalant",
+          "weight": 1
+        },
+        {
+          "name": "dubwool",
+          "weight": 1
+        }
+      ],
       "lvl": 20
     },
     {
       "name": "tauros",
       "hab": [
         "cobblemonfury:apricorn_pack"
+      ],
+      "pokemons": [
+        {
+          "name": "tauros",
+          "weight": 1
+        },
+        {
+          "name": "bouffalant",
+          "weight": 1
+        },
+        {
+          "name": "mudsdale",
+          "weight": 1
+        }
       ],
       "lvl": 30
     },
@@ -240,6 +564,24 @@
         "minecraft:chiseled_stone_bricks",
         "minecraft:diamond"
       ],
+      "pokemons": [
+        {
+          "name": "altaria",
+          "weight": 1
+        },
+        {
+          "name": "dragonite",
+          "weight": 1
+        },
+        {
+          "name": "salamence",
+          "weight": 1
+        },
+        {
+          "name": "togekiss",
+          "weight": 1
+        }
+      ],
       "lvl": 40
     },
     {
@@ -247,6 +589,20 @@
       "hab": [
         "minecraft:lily_pad",
         "minecraft:mangrove_roots"
+      ],
+      "pokemons": [
+        {
+          "name": "muk",
+          "weight": 1
+        },
+        {
+          "name": "garbodor",
+          "weight": 1
+        },
+        {
+          "name": "swalot",
+          "weight": 1
+        }
       ],
       "lvl": 10
     },
@@ -259,6 +615,24 @@
         "minecraft:dead_bush",
         "minecraft:dead_bush"
       ],
+      "pokemons": [
+        {
+          "name": "skorupi",
+          "weight": 1
+        },
+        {
+          "name": "spinarak",
+          "weight": 1
+        },
+        {
+          "name": "venonat",
+          "weight": 1
+        },
+        {
+          "name": "sizzlipede",
+          "weight": 1
+        }
+      ],
       "lvl": 20
     },
     {
@@ -269,7 +643,25 @@
         "minecraft:dandelion",
         "minecraft:dandelion"
       ],
-      "lvl": "EV21"
+      "pokemons": [
+        {
+          "name": "bellsprout",
+          "weight": 1
+        },
+        {
+          "name": "oddish",
+          "weight": 1
+        },
+        {
+          "name": "budew",
+          "weight": 1
+        },
+        {
+          "name": "sunkern",
+          "weight": 1
+        }
+      ],
+      "lvl": 10
     },
     {
       "name": "weezing",
@@ -283,6 +675,20 @@
         "cobblemonfury:tapis_poison",
         "cobblemonfury:tapis_poison",
         "cobblemonfury:tapis_poison"
+      ],
+      "pokemons": [
+        {
+          "name": "weezing",
+          "weight": 1
+        },
+        {
+          "name": "garbodor",
+          "weight": 1
+        },
+        {
+          "name": "swalot",
+          "weight": 1
+        }
       ],
       "lvl": 20
     },
@@ -299,6 +705,24 @@
         "cobblemonfury:plant_poison",
         "cobblemonfury:plant_poison"
       ],
+      "pokemons": [
+        {
+          "name": "toxicroak",
+          "weight": 1
+        },
+        {
+          "name": "seismitoad",
+          "weight": 1
+        },
+        {
+          "name": "poliwrath",
+          "weight": 1
+        },
+        {
+          "name": "lucario",
+          "weight": 1
+        }
+      ],
       "lvl": 30
     },
     {
@@ -314,6 +738,24 @@
         "minecraft:wheat_seeds",
         "minecraft:wheat_seeds"
       ],
+      "pokemons": [
+        {
+          "name": "turtwig",
+          "weight": 1
+        },
+        {
+          "name": "bulbasaur",
+          "weight": 1
+        },
+        {
+          "name": "treecko",
+          "weight": 1
+        },
+        {
+          "name": "chikorita",
+          "weight": 1
+        }
+      ],
       "lvl": 10
     },
     {
@@ -322,22 +764,165 @@
         "minecraft:pumpkin",
         "minecraft:melon"
       ],
+      "pokemons": [
+        {
+          "name": "fraxure",
+          "weight": 1
+        },
+        {
+          "name": "dragonair",
+          "weight": 1
+        },
+        {
+          "name": "shelgon",
+          "weight": 1
+        },
+        {
+          "name": "gabite",
+          "weight": 1
+        }
+      ],
       "lvl": 20
     },
     {
       "name": "vileplume",
       "hab": [
         "cobblemon:oran_berry",
-        "cobblemon:cherry_berry",
+        "cobblemon:cheri_berry",
         "cobblemon:chesto_berry"
       ],
+      "pokemons": [
+        {
+          "name": "vileplume",
+          "weight": 1
+        },
+        {
+          "name": "venusaur",
+          "weight": 1
+        },
+        {
+          "name": "bellossom",
+          "weight": 1
+        }
+      ],
       "lvl": 10
+    },
+    {
+      "name": "monferno",
+      "hab": [],
+      "pokemons": [
+        {
+          "name": "monferno",
+          "weight": 1
+        },
+        {
+          "name": "combusken",
+          "weight": 1
+        },
+        {
+          "name": "pignite",
+          "weight": 1
+        },
+        {
+          "name": "charmeleon",
+          "weight": 1
+        }
+      ],
+      "lvl": 0
+    },
+    {
+      "name": "magmortar",
+      "hab": [],
+      "pokemons": [
+        {
+          "name": "magmortar",
+          "weight": 1
+        },
+        {
+          "name": "electivire",
+          "weight": 1
+        },
+        {
+          "name": "magnezone",
+          "weight": 1
+        },
+        {
+          "name": "rhyperior",
+          "weight": 1
+        }
+      ],
+      "lvl": 0
+    },
+    {
+      "name": "golem",
+      "hab": [],
+      "pokemons": [
+        {
+          "name": "golem",
+          "weight": 1
+        },
+        {
+          "name": "gigalith",
+          "weight": 1
+        },
+        {
+          "name": "machamp",
+          "weight": 1
+        },
+        {
+          "name": "gengar",
+          "weight": 1
+        }
+      ],
+      "lvl": 0
+    },
+    {
+      "name": "victreebel",
+      "hab": [],
+      "pokemons": [
+        {
+          "name": "victreebel",
+          "weight": 1
+        },
+        {
+          "name": "venusaur",
+          "weight": 1
+        },
+        {
+          "name": "carnivine",
+          "weight": 1
+        }
+      ],
+      "lvl": 0
+    },
+    {
+      "name": "grotle",
+      "hab": [],
+      "pokemons": [
+        {
+          "name": "grotle",
+          "weight": 1
+        },
+        {
+          "name": "ivysaur",
+          "weight": 1
+        },
+        {
+          "name": "bayleef",
+          "weight": 1
+        },
+        {
+          "name": "grovyle",
+          "weight": 1
+        }
+      ],
+      "lvl": 0
     }
   ],
   "mega_habitats": [
     {
       "name": "forge",
-      "blockList": [
+      "biomes": [
         "cobblemonfury:forge_bottom",
         "cobblemonfury:forge_top",
         "cobblemonfury:forge_side",
@@ -367,17 +952,16 @@
         "minecraft:torch",
         "minecraft:torch"
       ],
-      "recipe": [
-        "minecraft:emerald_block",
-        "minecraft:magma_block",
-        "minecraft:magma_block",
-        "minecraft:magma_block",
-        "cobblemonfury:crystal_fire"
+      "pokemons": [
+        "emboar",
+        "magmortar",
+        "heatmor",
+        "magmar"
       ]
     },
     {
-      "name": "desert",
-      "blockList": [
+      "name": "sandy_base",
+      "biomes": [
         "cobblemonfury:silice_melted",
         "cobblemonfury:silice_melted",
         "cobblemonfury:silice_melted",
@@ -407,17 +991,16 @@
         "minecraft:torch",
         "minecraft:torch"
       ],
-      "recipe": [
-        "minecraft:emerald_block",
-        "minecraft:sand",
-        "minecraft:sand",
-        "minecraft:sand",
-        "cobblemonfury:crystal_sand"
+      "pokemons": [
+        "krookodile",
+        "camerupt",
+        "hippopotas",
+        "trapinch"
       ]
     },
     {
-      "name": "poison",
-      "blockList": [
+      "name": "poison_base",
+      "biomes": [
         "cobblemonfury:cobblestone_poisoned",
         "cobblemonfury:cobblestone_poisoned",
         "cobblemonfury:cobblestone_poisoned",
@@ -446,17 +1029,17 @@
         "cobblemonfury:plant_poison",
         "cobblemonfury:plant_poison"
       ],
-      "recipe": [
-        "minecraft:emerald_block",
-        "cobblemonfury:cobblestone_poisoned",
-        "cobblemonfury:cobblestone_poisoned",
-        "cobblemonfury:cobblestone_poisoned",
-        "cobblemonfury:crystal_poison"
+      "pokemons": [
+        "muk",
+        "skorupi",
+        "victreebel",
+        "weezing",
+        "toxicroak"
       ]
     },
     {
-      "name": "labo",
-      "blockList": [
+      "name": "Faire pleuvoir des minerais",
+      "biomes": [
         "cobblemonfury:labo_1",
         "cobblemonfury:labo_2",
         "cobblemonfury:mini_xp",
@@ -474,33 +1057,176 @@
         "minecraft:repeater",
         "minecraft:repeater"
       ],
-      "recipe": [
-        "minecraft:emerald",
-        "minecraft:redstone",
-        "minecraft:redstone",
-        "minecraft:redstone",
-        "cobblemon:exp_candy_s"
+      "pokemons": [
+        "machop",
+        "ditto",
+        "magnemite"
       ]
     },
     {
-      "name": "rhyhorn",
-      "blockList": [
+      "name": "underground",
+      "biomes": [
         "minecraft:gilded_blackstone",
         "minecraft:blackstone_stairs",
         "minecraft:blackstone_stairs",
         "minecraft:blackstone_stairs",
         "minecraft:blackstone_stairs",
-        "minecraft:gold_block",
-        "minecraft:gold_block",
-        "minecraft:gold_block",
         "minecraft:gold_block"
       ],
-      "recipe": [
-        "minecraft:iron_pickaxe",
-        "minecraft:paper",
-        "minecraft:paper",
-        "minecraft:paper",
-        "minecraft:enchanted_book"
+      "pokemons": [
+        "rhyhorn",
+        "dugtrio"
+      ]
+    },
+    {
+      "name": "fence_base",
+      "biomes": [
+        "cobblemon:apricorn_fence",
+        "cobblemon:apricorn_fence",
+        "cobblemon:apricorn_fence",
+        "cobblemon:apricorn_fence",
+        "minecraft:hay_block",
+        "minecraft:hay_block",
+        "minecraft:hay_block",
+        "minecraft:hay_block",
+        "minecraft:hay_block",
+        "minecraft:hay_block",
+        "minecraft:barrel",
+        "minecraft:campfire",
+        "minecraft:campfire",
+        "minecraft:campfire",
+        "minecraft:campfire",
+        "minecraft:mossy_cobblestone",
+        "minecraft:mossy_cobblestone",
+        "minecraft:mossy_cobblestone",
+        "minecraft:mossy_cobblestone"
+      ],
+      "pokemons": [
+        "miltank",
+        "mareep"
+      ]
+    },
+    {
+      "name": "heating_base",
+      "biomes": [
+        "minecraft:magma_block",
+        "minecraft:magma_block",
+        "minecraft:magma_block",
+        "minecraft:magma_block",
+        "minecraft:lava_bucket",
+        "minecraft:lava_bucket",
+        "minecraft:lava_bucket",
+        "minecraft:lava_bucket",
+        "minecraft:copper_block",
+        "minecraft:copper_block",
+        "minecraft:copper_block",
+        "minecraft:copper_block",
+        "minecraft:copper_block",
+        "minecraft:copper_block",
+        "minecraft:copper_block",
+        "minecraft:copper_block",
+        "minecraft:copper_block"
+      ],
+      "pokemons": [
+        "chimchar",
+        "monferno",
+        "torkoal"
+      ]
+    },
+    {
+      "name": "wooding_base",
+      "biomes": [
+        "cobblemon:apricorn_log",
+        "cobblemon:apricorn_log",
+        "cobblemon:apricorn_log",
+        "cobblemon:apricorn_log",
+        "cobblemon:apricorn_log",
+        "cobblemon:apricorn_log",
+        "cobblemon:apricorn_log",
+        "cobblemon:apricorn_log",
+        "cobblemon:apricorn_planks",
+        "cobblemon:apricorn_planks",
+        "cobblemon:apricorn_planks",
+        "cobblemon:apricorn_planks",
+        "cobblemon:apricorn_planks",
+        "cobblemon:apricorn_planks",
+        "cobblemon:apricorn_planks",
+        "cobblemon:apricorn_planks",
+        "minecraft:torch",
+        "minecraft:torch",
+        "minecraft:torch",
+        "minecraft:torch"
+      ],
+      "pokemons": [
+        "fraxure",
+        "grotle"
+      ]
+    },
+    {
+      "name": "farmer_base",
+      "biomes": [
+        "cobblemon:apricorn_planks",
+        "cobblemon:apricorn_planks",
+        "cobblemon:apricorn_planks",
+        "cobblemon:apricorn_planks",
+        "cobblemon:apricorn_slab",
+        "cobblemon:apricorn_slab",
+        "cobblemon:apricorn_slab",
+        "cobblemon:apricorn_slab",
+        "cobblemon:apricorn_slab",
+        "cobblemon:apricorn_slab",
+        "cobblemon:apricorn_slab",
+        "cobblemon:apricorn_slab",
+        "minecraft:stone_brick_stairs",
+        "minecraft:stone_brick_stairs",
+        "minecraft:stone_brick_stairs",
+        "minecraft:stone_brick_stairs",
+        "minecraft:stone_brick_wall",
+        "minecraft:stone_brick_wall",
+        "minecraft:stone_brick_wall",
+        "minecraft:stone_brick_wall",
+        "minecraft:stone_bricks",
+        "minecraft:stone_bricks",
+        "minecraft:stone_bricks",
+        "minecraft:stone_bricks",
+        "minecraft:water_bucket",
+        "cobblemon:apricorn_fence",
+        "cobblemon:apricorn_fence",
+        "cobblemon:apricorn_fence",
+        "cobblemon:apricorn_fence"
+      ],
+      "pokemons": [
+        "vileplume",
+        "turtwig"
+      ]
+    },
+    {
+      "name": "mining_base",
+      "biomes": [
+        "minecraft:rail",
+        "minecraft:rail",
+        "minecraft:rail",
+        "minecraft:rail",
+        "minecraft:rail",
+        "minecraft:rail",
+        "minecraft:rail",
+        "minecraft:rail",
+        "minecraft:minecart",
+        "minecraft:lantern",
+        "minecraft:lantern",
+        "cobblemon:apricorn_planks",
+        "cobblemon:apricorn_planks",
+        "cobblemon:apricorn_planks",
+        "cobblemon:apricorn_planks",
+        "cobblemon:apricorn_planks",
+        "cobblemon:apricorn_planks",
+        "cobblemon:apricorn_planks",
+        "cobblemon:apricorn_planks",
+        "cobblemon:apricorn_planks"
+      ],
+      "pokemons": [
+        "garganacl",
+        "graveler"
       ]
     }
   ],
@@ -558,27 +1284,11 @@
       ]
     },
     {
-      "name": "monferno",
-      "ability": "transform",
-      "blocks": [
-        "minecraft:copper_block",
-        "cobblemonfury:forge_bottom"
-      ]
-    },
-    {
       "name": "heatmor",
       "ability": "transform",
       "blocks": [
         "minecraft:iron_block",
         "cobblemonfury:forge_side"
-      ]
-    },
-    {
-      "name": "magmortar",
-      "ability": "transform",
-      "blocks": [
-        "minecraft:gold_block",
-        "cobblemonfury:forge_top"
       ]
     },
     {
@@ -595,14 +1305,6 @@
       "blocks": [
         "minecraft:stone",
         "minecraft:gravel"
-      ]
-    },
-    {
-      "name": "golem",
-      "ability": "destroy",
-      "blocks": [
-        "minecraft:deepslate",
-        "minecraft:blackstone"
       ]
     },
     {
@@ -692,14 +1394,6 @@
       ]
     },
     {
-      "name": "victreebel",
-      "ability": "transform",
-      "blocks": [
-        "minecraft:poppy",
-        "cobblemonfury:plant_poison"
-      ]
-    },
-    {
       "name": "turtwig",
       "ability": "destroy",
       "blocks": [
@@ -724,6 +1418,38 @@
         "minecraft:carrot",
         "minecraft:potato",
         "minecraft:wheat"
+      ]
+    },
+    {
+      "name": "monferno",
+      "ability": "transform",
+      "blocks": [
+        "minecraft:copper_block",
+        "cobblemonfury:forge_bottom"
+      ]
+    },
+    {
+      "name": "magmortar",
+      "ability": "transform",
+      "blocks": [
+        "minecraft:gold_block",
+        "cobblemonfury:forge_top"
+      ]
+    },
+    {
+      "name": "golem",
+      "ability": "destroy",
+      "blocks": [
+        "minecraft:deepslate",
+        "minecraft:blackstone"
+      ]
+    },
+    {
+      "name": "victreebel",
+      "ability": "transform",
+      "blocks": [
+        "minecraft:poppy",
+        "cobblemonfury:plant_poison"
       ]
     },
     {
