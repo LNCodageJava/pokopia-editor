@@ -617,7 +617,7 @@ export default function App() {
           // Créer les règles depuis les habitats
           const rulesFromHabitats = data.habitats.map((h) => {
             const capacity = capacityMap.get(h.name);
-            return {
+            const rule = {
               pattern: Array.isArray(h.hab)
                 ? h.hab.slice(0, 9).concat(Array(9 - h.hab.length).fill(null))
                 : Array(9).fill(null),
@@ -628,6 +628,16 @@ export default function App() {
                 ? capacity.blocks.slice(0, 3).concat(Array(3 - capacity.blocks.length).fill(null))
                 : Array(3).fill(null),
             };
+            // Importer itemPrice et maxValue pour stardust
+            if (capacity?.ability === "stardust") {
+              if (capacity.itemPrice !== undefined) {
+                rule.itemPrice = capacity.itemPrice;
+              }
+              if (capacity.maxValue !== undefined) {
+                rule.maxValue = capacity.maxValue;
+              }
+            }
+            return rule;
           });
 
           // Créer les cartes pokémon/poids depuis les habitats
@@ -656,7 +666,7 @@ export default function App() {
             data.capacities.forEach(c => {
               if (!habitatMap.has(c.name)) {
                 // Ce Pokémon a une capacité mais pas d'habitat
-                rulesFromCapacitiesOnly.push({
+                const rule = {
                   pattern: Array(9).fill(null),
                   pokemon: c.name,
                   level: 0,
@@ -664,7 +674,17 @@ export default function App() {
                   capacityBlocks: Array.isArray(c.blocks)
                     ? c.blocks.slice(0, 3).concat(Array(3 - c.blocks.length).fill(null))
                     : Array(3).fill(null),
-                });
+                };
+                // Importer itemPrice et maxValue pour stardust
+                if (c.ability === "stardust") {
+                  if (c.itemPrice !== undefined) {
+                    rule.itemPrice = c.itemPrice;
+                  }
+                  if (c.maxValue !== undefined) {
+                    rule.maxValue = c.maxValue;
+                  }
+                }
+                rulesFromCapacitiesOnly.push(rule);
               }
             });
           }
@@ -793,11 +813,21 @@ export default function App() {
         if (!r.pokemon) return null;
         if (!r.ability && (!r.capacityBlocks || r.capacityBlocks.every(b => !b))) return null;
         const blocks = (r.capacityBlocks || []).slice(0, 3).filter((x) => x != null);
-        return {
+        const capacity = {
           name: r.pokemon,
           ability: r.ability || "none",
           blocks
         };
+        // Ajouter itemPrice et maxValue pour stardust
+        if (r.ability === "stardust") {
+          if (r.itemPrice !== undefined && r.itemPrice !== "") {
+            capacity.itemPrice = r.itemPrice;
+          }
+          if (r.maxValue !== undefined && r.maxValue !== "") {
+            capacity.maxValue = r.maxValue;
+          }
+        }
+        return capacity;
       })
       .filter(Boolean);
 

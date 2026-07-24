@@ -225,6 +225,18 @@ export default function RuleCard({
     setRules(next);
   }
 
+  function setItemPrice(itemPrice) {
+    const next = [...rules];
+    next[index] = { ...next[index], itemPrice: itemPrice === "" ? "" : Math.max(0, parseFloat(itemPrice) || 0) };
+    setRules(next);
+  }
+
+  function setMaxValue(maxValue) {
+    const next = [...rules];
+    next[index] = { ...next[index], maxValue: maxValue === "" ? "" : Math.max(0, parseFloat(maxValue) || 0) };
+    setRules(next);
+  }
+
   function removeCapacityBlock(slotIndex) {
     setCapacityBlockAt(slotIndex, null);
   }
@@ -339,6 +351,17 @@ export default function RuleCard({
               <div style={{ marginTop: 8, fontSize: 11, fontWeight: 'bold', textAlign: 'center', color: '#555' }}>
                 {rule.ability || '—'}
               </div>
+
+              {rule.ability === "stardust" && (rule.itemPrice || rule.maxValue) && (
+                <div style={{ marginTop: 4, fontSize: 9, textAlign: 'center', color: '#333', lineHeight: 1.3 }}>
+                  <div>Price: {rule.itemPrice || 0}</div>
+                  <div>Max: {rule.maxValue || 0}</div>
+                  <div style={{ fontWeight: 'bold', color: '#2b6cdf' }}>
+                    Total: {((rule.itemPrice || 0) * (rule.maxValue || 0)).toFixed(2)}
+                  </div>
+                </div>
+              )}
+
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2, marginTop: 4 }}>
                 {(rule.capacityBlocks || Array(3).fill(null)).map((b, i) => (
                   <div key={i} style={{ width: 24, height: 24, border: '1px solid #ddd', borderRadius: 2, overflow: 'hidden' }}>
@@ -606,15 +629,51 @@ export default function RuleCard({
 
                 <div className="ruleCard__levelRow">
                   <div className="ruleCard__labelSmall">Ability</div>
-                  <input
-                    type="text"
+                  <select
                     className="ruleCard__levelInput"
                     value={rule.ability || ""}
                     onChange={(e) => setAbility(e.target.value)}
                     onPointerDown={(e) => e.stopPropagation()}
-                    placeholder="Nom de l'ability"
-                  />
+                  >
+                    <option value="">-- Choisir --</option>
+                    <option value="destroy">destroy</option>
+                    <option value="place">place</option>
+                    <option value="transform">transform</option>
+                    <option value="stardust">stardust</option>
+                  </select>
                 </div>
+
+                {rule.ability === "stardust" && (
+                  <>
+                    <div className="ruleCard__levelRow">
+                      <div className="ruleCard__labelSmall">Item Price</div>
+                      <input
+                        type="number"
+                        step="0.01"
+                        className="ruleCard__levelInput"
+                        value={rule.itemPrice ?? ""}
+                        onChange={(e) => setItemPrice(e.target.value)}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        min="0"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div className="ruleCard__levelRow">
+                      <div className="ruleCard__labelSmall">Max Value</div>
+                      <input
+                        type="number"
+                        step="0.01"
+                        className="ruleCard__levelInput"
+                        value={rule.maxValue ?? ""}
+                        onChange={(e) => setMaxValue(e.target.value)}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        min="0"
+                        placeholder="0"
+                      />
+                    </div>
+                  </>
+                )}
 
                 <div className="ruleCard__labelSmall" style={{ marginTop: 8 }}>Capacity Blocks</div>
                 <div style={{ display: 'flex', gap: 4, marginBottom: 8 }}>
