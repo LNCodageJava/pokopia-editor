@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { DndContext, useDraggable, useDroppable } from "@dnd-kit/core";
 import "./App.css";
 import RuleCard from "./components/RuleCard";
+import RuleCardEditor from "./components/RuleCardEditor";
 import MegaHabitatCard from "./components/MegaHabitatCard";
 import PokemonWeightCard from "./components/PokemonWeightCard";
 import ShapesLayer from "./components/ShapesLayer";
@@ -288,6 +289,8 @@ export default function App() {
 
   // selected cards (array of indices)
   const [selected, setSelected] = useState([]);
+  // editing state: { type: 'rule'|'mega'|'pokemonweight', index: number } or null
+  const [editingCard, setEditingCard] = useState(null);
   // shapes drawn on canvas (rect or arrow)
   const [shapes, setShapes] = useState(() => {
     try {
@@ -1277,6 +1280,8 @@ export default function App() {
                   setSelected={setSelected}
                   pokemonSuggestions={filteredPokemons}
                   blockSuggestions={filteredBlocks}
+                  editingCard={editingCard}
+                  setEditingCard={setEditingCard}
                 />
               ))}
 
@@ -1477,6 +1482,19 @@ export default function App() {
             </div>
           </div>
         </div>
+
+      {/* Modal d'édition global */}
+      {editingCard && editingCard.type === 'rule' && (
+        <RuleCardEditor
+          rule={rules[editingCard.index]}
+          index={editingCard.index}
+          onClose={() => setEditingCard(null)}
+          rules={rules}
+          setRules={setRules}
+          pokemonSuggestions={filteredPokemons}
+          blockSuggestions={filteredBlocks}
+        />
+      )}
     </DndContext>
   );
 }

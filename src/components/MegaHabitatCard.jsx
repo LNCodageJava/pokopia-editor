@@ -429,7 +429,6 @@ export default function MegaHabitatCard({
             </div>
           </div>
         </div>
-        </>
       )}
     </div>
   );
