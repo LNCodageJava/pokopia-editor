@@ -42,7 +42,7 @@ const POKEMONS = [
     "poliwag", "poliwhirl", "poliwrath", "abra", "kadabra", "alakazam", "machop",
     "machoke", "machamp", "bellsprout", "weepinbell", "victreebel", "tentacool",
     "tentacruel", "geodude", "graveler", "golem", "ponyta", "rapidash", "slowpoke",
-    "slowbro", "magnemite", "magneton", "farfetch'd", "doduo", "dodrio", "seel",
+    "slowbro", "magnemite", "magneton", "farfetchd", "doduo", "dodrio", "seel",
     "dewgong", "grimer", "muk", "shellder", "cloyster", "gastly", "haunter",
     "gengar", "onix", "drowzee", "hypno", "krabby", "kingler", "voltorb",
     "electrode", "exeggcute", "exeggutor", "cubone", "marowak", "hitmonlee",
@@ -789,22 +789,15 @@ export default function App() {
       .map((r) => {
         if (!r.pokemon) return null; // export only entries that have a pokemon name
         // produce hab array by removing nulls and limiting to 9
-        const hab = (r.pattern || []).slice(0, 9).filter((x) => x != null);
+        // Déplacer le 5ème bloc (index 4) en première position
+        const pattern = r.pattern || [];
+        const block5 = pattern[4]; // Le 5ème bloc
+        const reorderedPattern = block5
+          ? [block5, ...pattern.slice(0, 4), ...pattern.slice(5, 9)]
+          : pattern.slice(0, 9);
+        const hab = reorderedPattern.filter((x) => x != null);
 
-        // Ajouter pokemons depuis les pokemonWeightCards si disponible
-        const matchingCard = pokemonWeightCards.find(c =>
-          c.pokemons && c.pokemons[0]?.name === r.pokemon
-        );
-
-        const pokemonsData = matchingCard
-          ? matchingCard.pokemons.filter(p => p && p.name).map(p => ({ name: p.name, weight: p.weight }))
-          : undefined;
-
-        const result = { name: r.pokemon, hab, lvl: r.level ?? 0 };
-        if (pokemonsData && pokemonsData.length > 0) {
-          result.pokemons = pokemonsData;
-        }
-        return result;
+        return { name: r.pokemon, hab, lvl: r.level ?? 0 };
       })
       .filter(Boolean);
 

@@ -636,10 +636,11 @@ export default function RuleCard({
                     onPointerDown={(e) => e.stopPropagation()}
                   >
                     <option value="">-- Choisir --</option>
+                    <option value="stardust">stardust</option>
                     <option value="destroy">destroy</option>
                     <option value="place">place</option>
                     <option value="transform">transform</option>
-                    <option value="stardust">stardust</option>
+                    <option value="mount">mount</option>
                   </select>
                 </div>
 
@@ -759,6 +760,7 @@ export default function RuleCard({
             )}
           </div>
         </div>
+        </>
       )}
     </div>
   );
