@@ -246,8 +246,8 @@ export default function App() {
 
   const createMegaHabitat = () => ({
     name: "",
-    blockList: Array(30).fill(null),
-    pokemons: Array(6).fill(null),
+    block: null,
+    pokemons: Array(9).fill(null),
   });
 
   const createPokemonWeightCard = () => ({
@@ -699,51 +699,37 @@ export default function App() {
           const importedMegaHabitats = [];
           if (Array.isArray(data.mega_habitats)) {
             data.mega_habitats.forEach(m => {
-              // Create blockList, filling with null to reach 30 slots (6 lignes de 5)
-              const blockList = Array(30).fill(null);
+              // Prendre le premier bloc trouvé dans recipes ou blockList
+              let block = null;
 
               // Support du nouveau format "recipes" et de l'ancien format "biomes" ou "blockList"
-              if (Array.isArray(m.recipes)) {
-                // Nouveau format: recipes avec ingredients et result
-                m.recipes.forEach((recipe, recipeIndex) => {
-                  if (recipeIndex >= 6) return; // Max 6 recettes/lignes
-                  const lineStart = recipeIndex * 5;
-
-                  // Placer les ingredients (max 4)
-                  if (Array.isArray(recipe.ingredients)) {
-                    recipe.ingredients.forEach((ing, i) => {
-                      if (i < 4 && ing) {
-                        blockList[lineStart + i] = ing;
-                      }
-                    });
-                  }
-
-                  // Placer le result en 5ème position
-                  if (recipe.result) {
-                    blockList[lineStart + 4] = recipe.result;
-                  }
-                });
+              if (Array.isArray(m.recipes) && m.recipes.length > 0) {
+                // Nouveau format: prendre le premier ingrédient ou résultat
+                const firstRecipe = m.recipes[0];
+                if (Array.isArray(firstRecipe.ingredients) && firstRecipe.ingredients.length > 0) {
+                  block = firstRecipe.ingredients[0];
+                } else if (firstRecipe.result) {
+                  block = firstRecipe.result;
+                }
               } else {
-                // Ancien format: blockList ou biomes en liste linéaire
+                // Ancien format: prendre le premier bloc de la liste
                 const sourceBlocks = m.blockList || m.biomes;
-                if (Array.isArray(sourceBlocks)) {
-                  sourceBlocks.forEach((b, i) => {
-                    if (i < 30) blockList[i] = b;
-                  });
+                if (Array.isArray(sourceBlocks) && sourceBlocks.length > 0) {
+                  block = sourceBlocks[0];
                 }
               }
 
-              // Create pokemons array, filling with null to reach 6 slots
-              const pokemons = Array(6).fill(null);
+              // Create pokemons array, filling with null to reach 9 slots
+              const pokemons = Array(9).fill(null);
               if (Array.isArray(m.pokemons)) {
                 m.pokemons.forEach((p, i) => {
-                  if (i < 6) pokemons[i] = p;
+                  if (i < 9) pokemons[i] = p;
                 });
               }
 
               importedMegaHabitats.push({
                 name: m.name || "",
-                blockList,
+                block,
                 pokemons,
               });
             });
@@ -831,27 +817,16 @@ export default function App() {
       .map((m) => {
         if (!m.name) return null; // export only entries with a name
 
-        // Convertir blockList (30 slots) en recettes (6 lignes de 5)
+        // Créer une recette avec un seul ingrédient si block est défini
         const recipes = [];
-        const blockList = m.blockList || [];
-
-        for (let i = 0; i < 6; i++) {
-          const lineStart = i * 5;
-          const line = blockList.slice(lineStart, lineStart + 5);
-
-          // Si la ligne a au moins un block non-null, créer une recette
-          if (line.some(b => b != null)) {
-            const ingredients = line.slice(0, 4).filter(b => b != null);
-            const result = line[4] || null;
-
-            // Ne créer une recette que si on a au moins un ingrédient et un résultat
-            if (ingredients.length > 0 && result) {
-              recipes.push({ ingredients, result });
-            }
-          }
+        if (m.block) {
+          recipes.push({
+            ingredients: [m.block],
+            result: m.block
+          });
         }
 
-        const pokemons = (m.pokemons || []).slice(0, 6).filter((x) => x != null);
+        const pokemons = (m.pokemons || []).slice(0, 9).filter((x) => x != null);
         return { name: m.name, recipes, pokemons };
       })
       .filter(Boolean);

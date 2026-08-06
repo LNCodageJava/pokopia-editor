@@ -143,17 +143,15 @@ export default function MegaHabitatCard({
     window.addEventListener("pointercancel", onPointerUp);
   }
 
-  function setBlockAt(slotIndex, blockId) {
+  function setBlock(blockId) {
     const next = [...megaHabitats];
-    const currentBlockList = next[index].blockList || Array(30).fill(null);
-    next[index] = { ...next[index], blockList: [...currentBlockList] };
-    next[index].blockList[slotIndex] = blockId;
+    next[index] = { ...next[index], block: blockId };
     setMegaHabitats(next);
   }
 
   function setPokemonAt(pokemonSlot, pokemonId) {
     const next = [...megaHabitats];
-    const currentPokemons = next[index].pokemons || Array(6).fill(null);
+    const currentPokemons = next[index].pokemons || Array(9).fill(null);
     next[index] = { ...next[index], pokemons: [...currentPokemons] };
     next[index].pokemons[pokemonSlot] = pokemonId;
     setMegaHabitats(next);
@@ -189,44 +187,38 @@ export default function MegaHabitatCard({
             {megaHabitat.name || "Mega Habitat"}
           </div>
 
-          {/* Grille 5x6 = 30 blocs */}
+          {/* Bloc unique */}
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(5, 1fr)',
-            gap: 2,
-            marginBottom: 8
+            width: 48,
+            height: 48,
+            border: '2px solid #ddd',
+            borderRadius: 4,
+            overflow: 'hidden',
+            backgroundColor: '#f9f9f9',
+            marginBottom: 8,
+            margin: '0 auto 8px'
           }}>
-            {(megaHabitat.blockList || Array(30).fill(null)).map((b, i) => (
-              <div key={i} style={{
-                width: 24,
-                height: 24,
-                border: '1px solid #ddd',
-                borderRadius: 2,
-                overflow: 'hidden',
-                backgroundColor: '#f9f9f9'
-              }}>
-                {b && (
-                  <ImageWithFallback
-                    src={getImage(b)}
-                    labelId={b}
-                    alt={b}
-                    style={{ width: '100%', height: '100%', imageRendering: "pixelated" }}
-                  />
-                )}
-              </div>
-            ))}
+            {megaHabitat.block && (
+              <ImageWithFallback
+                src={getImage(megaHabitat.block)}
+                labelId={megaHabitat.block}
+                alt={megaHabitat.block}
+                style={{ width: '100%', height: '100%', imageRendering: "pixelated" }}
+              />
+            )}
           </div>
 
-          {/* 6 pokémons */}
+          {/* 9 pokémons */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: 4
+            gap: 4,
+            maxWidth: 280,
+            margin: '0 auto'
           }}>
-            {(megaHabitat.pokemons || Array(6).fill(null)).map((p, i) => (
+            {(megaHabitat.pokemons || Array(9).fill(null)).slice(0, 9).map((p, i) => (
               <div key={i} style={{
-                width: 64,
-                height: 64,
+                aspectRatio: '1/1',
                 border: '2px solid #2b6cdf',
                 borderRadius: 4,
                 overflow: 'hidden',
@@ -274,77 +266,67 @@ export default function MegaHabitatCard({
           }}
         >
           <div className="ruleCard__editorInner" style={{ display: 'flex', gap: 16 }}>
-            {/* Colonne gauche : Grille 5x6 Blocs */}
+            {/* Colonne gauche : Bloc unique */}
             <div style={{ flex: '0 0 auto' }}>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(5, 1fr)',
-                gap: 4
-              }}>
-                {(megaHabitat.blockList || Array(30).fill(null)).map((b, i) => (
-                  <div key={i} style={{ position: 'relative' }}>
-                    <button
-                      className={
-                        "ruleCard__blockBtn" +
-                        (activeType === "block" && activeSlot === i
-                          ? " ruleCard__blockBtn--active"
-                          : "")
-                      }
-                      style={{ width: 40, height: 40 }}
-                      onPointerDown={(e) => e.stopPropagation()}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveType("block");
-                        setActiveSlot(i);
-                      }}
-                    >
-                      {b ? (
-                        <ImageWithFallback
-                          src={getImage(b)}
-                          labelId={b}
-                          alt={b}
-                          style={{ width: '100%', height: '100%', imageRendering: "pixelated" }}
-                        />
-                      ) : (
-                        <div style={{ fontSize: 10 }}>{i + 1}</div>
-                      )}
-                    </button>
-                    {b && (
-                      <button
-                        className="ruleCard__removeBtn"
-                        style={{ fontSize: 10, padding: '2px 4px' }}
-                        onPointerDown={(e) => e.stopPropagation()}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeBlock(i);
-                        }}
-                      >
-                        X
-                      </button>
-                    )}
-                  </div>
-                ))}
+              <div className="ruleCard__labelSmall" style={{ marginBottom: 8 }}>Bloc</div>
+              <div style={{ position: 'relative', display: 'inline-block' }}>
+                <button
+                  className={
+                    "ruleCard__blockBtn" +
+                    (activeType === "block" ? " ruleCard__blockBtn--active" : "")
+                  }
+                  style={{ width: 64, height: 64 }}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveType("block");
+                  }}
+                >
+                  {megaHabitat.block ? (
+                    <ImageWithFallback
+                      src={getImage(megaHabitat.block)}
+                      labelId={megaHabitat.block}
+                      alt={megaHabitat.block}
+                      style={{ width: '100%', height: '100%', imageRendering: "pixelated" }}
+                    />
+                  ) : (
+                    <div style={{ fontSize: 10 }}>Bloc</div>
+                  )}
+                </button>
+                {megaHabitat.block && (
+                  <button
+                    className="ruleCard__removeBtn"
+                    style={{ fontSize: 10, padding: '2px 4px', position: 'absolute', top: -4, right: -4 }}
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setBlock(null);
+                    }}
+                  >
+                    X
+                  </button>
+                )}
               </div>
             </div>
 
-            {/* Colonne droite : Autocomplete + Nom + 6 Pokémons */}
+            {/* Colonne droite : Autocomplete + Nom + 9 Pokémons */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
               {/* Autocomplete */}
               <div className="ruleCard__autocompleteRow">
                 <div className="ruleCard__labelSmall">Recherche</div>
                 {activeType === "pokemon" ? (
                   <PokemonAutocomplete
-                    value={(megaHabitat.pokemons || Array(6).fill(null))[activeSlot] || ""}
+                    value={(megaHabitat.pokemons || Array(9).fill(null))[activeSlot] || ""}
                     suggestions={pokemonSuggestions}
                     onSelect={(p) => setPokemonAt(activeSlot, p)}
                     placeholder={`Choisir Pokémon ${activeSlot + 1}`}
                   />
                 ) : (
                   <PokemonAutocomplete
-                    value={(megaHabitat.blockList || Array(30).fill(null))[activeSlot] || ""}
+                    value={megaHabitat.block || ""}
                     suggestions={blockSuggestions}
-                    onSelect={(b) => setBlockAt(activeSlot, b)}
-                    placeholder={`Choisir bloc ${activeSlot + 1}`}
+                    onSelect={(b) => setBlock(b)}
+                    placeholder={`Choisir bloc`}
                   />
                 )}
               </div>
@@ -362,13 +344,13 @@ export default function MegaHabitatCard({
               </div>
 
               <div>
-                <div className="ruleCard__labelSmall" style={{ marginBottom: 8 }}>6 Pokémons</div>
+                <div className="ruleCard__labelSmall" style={{ marginBottom: 8 }}>9 Pokémons</div>
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(3, 1fr)',
                   gap: 4
                 }}>
-                  {(megaHabitat.pokemons || Array(6).fill(null)).map((p, i) => (
+                  {(megaHabitat.pokemons || Array(9).fill(null)).slice(0, 9).map((p, i) => (
                     <div key={i} style={{ position: 'relative' }}>
                       <button
                         className={
