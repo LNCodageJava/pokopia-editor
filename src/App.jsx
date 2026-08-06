@@ -4,6 +4,7 @@ import "./App.css";
 import RuleCard from "./components/RuleCard";
 import RuleCardEditor from "./components/RuleCardEditor";
 import MegaHabitatCard from "./components/MegaHabitatCard";
+import MegaHabitatEditor from "./components/MegaHabitatEditor";
 import PokemonWeightCard from "./components/PokemonWeightCard";
 import ShapesLayer from "./components/ShapesLayer";
 import ImageWithFallback from "./components/ImageWithFallback";
@@ -1285,10 +1286,10 @@ export default function App() {
                       return next;
                     });
                   }}
-                  megaHabitats={megaHabitats}
-                  setMegaHabitats={setMegaHabitats}
-                  pokemonSuggestions={filteredPokemons}
-                  blockSuggestions={filteredBlocks}
+                  selected={selected}
+                  setSelected={setSelected}
+                  editingCard={editingCard}
+                  setEditingCard={setEditingCard}
                 />
               ))}
 
@@ -1477,6 +1478,17 @@ export default function App() {
           onClose={() => setEditingCard(null)}
           rules={rules}
           setRules={setRules}
+          pokemonSuggestions={filteredPokemons}
+          blockSuggestions={filteredBlocks}
+        />
+      )}
+      {editingCard && editingCard.type === 'mega' && (
+        <MegaHabitatEditor
+          megaHabitat={megaHabitats[editingCard.index]}
+          index={editingCard.index}
+          onClose={() => setEditingCard(null)}
+          megaHabitats={megaHabitats}
+          setMegaHabitats={setMegaHabitats}
           pokemonSuggestions={filteredPokemons}
           blockSuggestions={filteredBlocks}
         />
