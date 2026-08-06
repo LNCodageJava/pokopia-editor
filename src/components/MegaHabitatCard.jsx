@@ -151,9 +151,14 @@ export default function MegaHabitatCard({
 
   function setPokemonAt(pokemonSlot, pokemonId) {
     const next = [...megaHabitats];
-    const currentPokemons = next[index].pokemons || Array(9).fill(null);
-    next[index] = { ...next[index], pokemons: [...currentPokemons] };
-    next[index].pokemons[pokemonSlot] = pokemonId;
+    const currentPokemons = next[index].pokemons || [];
+    // S'assurer qu'on a toujours 9 slots
+    const pokemons = Array(9).fill(null);
+    currentPokemons.forEach((p, i) => {
+      if (i < 9) pokemons[i] = p;
+    });
+    pokemons[pokemonSlot] = pokemonId;
+    next[index] = { ...next[index], pokemons };
     setMegaHabitats(next);
   }
 
@@ -179,7 +184,7 @@ export default function MegaHabitatCard({
         (isSelected ? " ruleCard--selected" : "")
       }
       onPointerDown={onPointerDown}
-      style={{ width: 300 }}
+      style={{ width: 400 }}
     >
       <div className="ruleCard__body">
         <div style={{ flex: 1 }}>
@@ -209,11 +214,12 @@ export default function MegaHabitatCard({
           </div>
 
           {/* 9 pokémons */}
+          
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
+            gridTemplateColumns: 'repeat(9, 1fr)',
             gap: 4,
-            maxWidth: 280,
+            maxWidth: 380,
             margin: '0 auto'
           }}>
             {(megaHabitat.pokemons || Array(9).fill(null)).slice(0, 9).map((p, i) => (

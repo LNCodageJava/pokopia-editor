@@ -270,7 +270,18 @@ export default function App() {
       const raw = localStorage.getItem(MEGA_DATA_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) return parsed;
+        if (Array.isArray(parsed)) {
+          // Normaliser chaque megaHabitat pour avoir exactement 9 slots pokémon
+          return parsed.map(m => {
+            const pokemons = Array(9).fill(null);
+            if (Array.isArray(m.pokemons)) {
+              m.pokemons.forEach((p, i) => {
+                if (i < 9) pokemons[i] = p;
+              });
+            }
+            return { ...m, pokemons };
+          });
+        }
       }
     } catch (err) {}
     return [];
@@ -719,11 +730,11 @@ export default function App() {
                 }
               }
 
-              // Create pokemons array, filling with null to reach 9 slots
+              // Create pokemons array with 9 slots
               const pokemons = Array(9).fill(null);
               if (Array.isArray(m.pokemons)) {
-                m.pokemons.forEach((p, i) => {
-                  if (i < 9) pokemons[i] = p;
+                m.pokemons.slice(0, 9).forEach((p, i) => {
+                  pokemons[i] = p;
                 });
               }
 
