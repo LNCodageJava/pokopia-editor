@@ -31,7 +31,7 @@ const BLOCKS = Object.keys(blockImages)
   .sort();
 
 const POKEMONS = [
-    "ss",
+    "ss","octillery",
     "bulbasaur", "ivysaur", "venusaur", "charmander", "charmeleon", "charizard",
     "squirtle", "wartortle", "blastoise", "caterpie", "metapod", "butterfree",
     "weedle", "kakuna", "beedrill", "pidgey", "pidgeotto", "pidgeot", "rattata",
@@ -613,19 +613,33 @@ export default function App() {
       try {
         const data = JSON.parse(event.target.result);
 
+        // Fonction helper pour remplacer / par ___ dans les blocks à l'import
+        const formatBlockNameImport = (blockName) => {
+          if (!blockName) return blockName;
+          return blockName.replace(/\//g, '___');
+        };
+
         // Support new pokopia_data structure: { habitats: [ { name, hab, lvl }, ... ], capacities: [...] }
         if (data && Array.isArray(data.habitats)) {
           // Créer un Map des habitats pour accès rapide
           const habitatMap = new Map();
           data.habitats.forEach(h => {
-            habitatMap.set(h.name, h);
+            // Convertir les blocks du format / vers ___
+            const formattedHab = Array.isArray(h.hab)
+              ? h.hab.map(formatBlockNameImport)
+              : h.hab;
+            habitatMap.set(h.name, { ...h, hab: formattedHab });
           });
 
           // Créer un Map des capacités
           const capacityMap = new Map();
           if (Array.isArray(data.capacities)) {
             data.capacities.forEach(c => {
-              capacityMap.set(c.name, c);
+              // Convertir les blocks du format / vers ___
+              const formattedBlocks = Array.isArray(c.blocks)
+                ? c.blocks.map(formatBlockNameImport)
+                : c.blocks;
+              capacityMap.set(c.name, { ...c, blocks: formattedBlocks });
             });
           }
 
@@ -719,15 +733,15 @@ export default function App() {
                 // Nouveau format: prendre le premier ingrédient ou résultat
                 const firstRecipe = m.recipes[0];
                 if (Array.isArray(firstRecipe.ingredients) && firstRecipe.ingredients.length > 0) {
-                  block = firstRecipe.ingredients[0];
+                  block = formatBlockNameImport(firstRecipe.ingredients[0]);
                 } else if (firstRecipe.result) {
-                  block = firstRecipe.result;
+                  block = formatBlockNameImport(firstRecipe.result);
                 }
               } else {
                 // Ancien format: prendre le premier bloc de la liste
                 const sourceBlocks = m.blockList || m.biomes;
                 if (Array.isArray(sourceBlocks) && sourceBlocks.length > 0) {
-                  block = sourceBlocks[0];
+                  block = formatBlockNameImport(sourceBlocks[0]);
                 }
               }
 
@@ -786,6 +800,12 @@ export default function App() {
 
   // export rules in pokopia_data format (habitats + capacities)
   function exportJSON() {
+    // Fonction helper pour remplacer ___ par / dans les blocks
+    const formatBlockName = (blockName) => {
+      if (!blockName) return blockName;
+      return blockName.replace(/___/g, '/');
+    };
+
     const habitats = rules
       .map((r) => {
         if (!r.pokemon) return null; // export only entries that have a pokemon name
@@ -796,7 +816,9 @@ export default function App() {
         const reorderedPattern = block5
           ? [block5, ...pattern.slice(0, 4), ...pattern.slice(5, 9)]
           : pattern.slice(0, 9);
-        const hab = reorderedPattern.filter((x) => x != null);
+        const hab = reorderedPattern
+          .filter((x) => x != null)
+          .map(formatBlockName);
 
         return { name: r.pokemon, hab, lvl: r.level ?? 0 };
       })
@@ -806,7 +828,10 @@ export default function App() {
       .map((r) => {
         if (!r.pokemon) return null;
         if (!r.ability && (!r.capacityBlocks || r.capacityBlocks.every(b => !b))) return null;
-        const blocks = (r.capacityBlocks || []).slice(0, 3).filter((x) => x != null);
+        const blocks = (r.capacityBlocks || [])
+          .slice(0, 3)
+          .filter((x) => x != null)
+          .map(formatBlockName);
         const capacity = {
           name: r.pokemon,
           ability: r.ability || "none",
@@ -833,8 +858,8 @@ export default function App() {
         const recipes = [];
         if (m.block) {
           recipes.push({
-            ingredients: [m.block],
-            result: m.block
+            ingredients: [formatBlockName(m.block)],
+            result: formatBlockName(m.block)
           });
         }
 
