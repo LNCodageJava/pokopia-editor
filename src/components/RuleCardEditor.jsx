@@ -309,6 +309,7 @@ export default function RuleCardEditor({
                   <option value="place">place</option>
                   <option value="transform">transform</option>
                   <option value="mount">mount</option>
+                  <option value="drop">drop</option>
                 </select>
               </div>
 
